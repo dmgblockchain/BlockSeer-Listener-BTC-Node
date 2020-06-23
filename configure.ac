@@ -572,6 +572,7 @@ AC_ARG_WITH([daemon],
   [build bitcoind daemon (default=yes)])],
   [build_bitcoind=$withval],
   [build_bitcoind=yes])
+AX_LIB_MYSQL([5.0])
 
 use_pkgconfig=yes
 case $host in

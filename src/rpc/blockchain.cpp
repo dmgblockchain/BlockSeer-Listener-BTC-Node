@@ -44,6 +44,13 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+// ADDED mysql
+#include <mysql_connection.h>
+#include <mysql_driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+using namespace sql;
 
 struct CUpdatedBlock
 {
@@ -2355,6 +2362,83 @@ UniValue dumptxoutset(const JSONRPCRequest& request)
     return result;
 }
 
+static UniValue dmgvalidate(const JSONRPCRequest& request)
+{
+            RPCHelpMan{"getblocktotalvalue",
+                "\nReturns an Object with information on the total value of transactions in block <hash>.\n",
+                {
+                    {"blockhash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, /*default */ "", "The block hash"},
+                },
+		RPCResult{
+                    RPCResult::Type::OBJ, "", "",
+                    {
+                        {RPCResult::Type::STR_HEX, "hash", "(string) the block hash (same as provided)."},
+                        {RPCResult::Type::STR_HEX, "nTx", "(numeric) The number of transactions in the block."},
+			{RPCResult::Type::STR_HEX, "totalValue", "(numeric) The total value of all the transactions in the block."}
+                    }},
+		RPCExamples{
+                    HelpExampleCli("getblocktotalvalue", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\" \"basic\"") +
+                    HelpExampleRpc("getblocktotalvalue", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\", \"basic\"")
+                }
+	     }.Check(request);
+    // mysql connection
+    //try {
+	sql::Driver *driver;
+	sql::Connection *con;
+	sql::Statement *stmt;
+	sql::ResultSet *res;
+	driver = get_driver_instance();
+	con = driver->connect("", "root", "");
+	/* Connect to the MySQL btc database */
+	con->setSchema("btc");
+	stmt = con->createStatement();
+	res = stmt->executeQuery("SELECT * FROM bitcoin_addresslabel LIMIT 1;");
+	std::string mysql_address = "";
+//	int count = 0
+	while (res->next()) {
+		mysql_address = res->getString("address");
+//		count ++
+	}
+	//return mysql_address;
+	delete res;
+	delete stmt;
+	delete con;
+    //} catch (sql::SQLException &e) {
+	
+    //}
+    // The following code was copied from the getblock function as we are performing a similar
+    // operation
+    //LOCK(cs_main);
+
+    //uint256 hash(ParseHashV(request.params[0], "blockhash"));
+
+    //const CBlockIndex* pblockindex = LookupBlockIndex(hash);
+    //if (!pblockindex) {
+    //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
+    //}
+    //const CBlock block = GetBlockChecked(pblockindex);
+
+    //AssertLockHeld(cs_main);
+    UniValue result(UniValue::VOBJ);
+
+    // Here we declare a variable to hold the total value
+    //double totalValue = 0;
+
+    // Now loop through the block’s transactions and each transactions “out” and add each
+    // amount to the total
+    //for(const auto& tx : block.vtx)
+    //{
+    //    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+    //        totalValue += tx->vout[i].nValue;
+    //    }
+    //}
+    result = mysql_address;
+    // Add the total number of transactions and the total value to our result.
+    //result.pushKV("numTxs", (uint64_t)block.vtx.size());
+    //result.pushKV("totalValue", ValueFromAmount(totalValue));
+    return result;
+}
+
 void RegisterBlockchainRPCCommands(CRPCTable &t)
 {
 // clang-format off
@@ -2381,6 +2465,7 @@ static const CRPCCommand commands[] =
     { "blockchain",         "pruneblockchain",        &pruneblockchain,        {"height"} },
     { "blockchain",         "savemempool",            &savemempool,            {} },
     { "blockchain",         "verifychain",            &verifychain,            {"checklevel","nblocks"} },
+    { "blockchain",         "dmgvalidate",            &dmgvalidate,            {"blockhash"} },
 
     { "blockchain",         "preciousblock",          &preciousblock,          {"blockhash"} },
     { "blockchain",         "scantxoutset",           &scantxoutset,           {"action", "scanobjects"} },
