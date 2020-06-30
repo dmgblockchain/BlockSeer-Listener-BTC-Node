@@ -4,20 +4,26 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <amount.h>
+#include <bitcoinapi/bitcoinapi.h>
 #include <chain.h>
 #include <chainparams.h>
 #include <consensus/consensus.h>
 #include <consensus/params.h>
 #include <consensus/validation.h>
 #include <core_io.h>
+#include <jsoncpp/json/json.h>
+#include <jsonrpccpp/client.h>
+#include <jsonrpccpp/client/connectors/httpclient.h>
 #include <key_io.h>
 #include <miner.h>
 #include <net.h>
+#include <nlohmann/json.hpp>
 #include <node/context.h>
 #include <policy/fees.h>
 #include <pow.h>
 #include <rpc/blockchain.h>
 #include <rpc/mining.h>
+#include <rpc/request.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
 #include <script/descriptor.h>
@@ -38,6 +44,16 @@
 
 #include <memory>
 #include <stdint.h>
+
+// ADDED mysql
+#include <mysql_connection.h>
+#include <mysql_driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+using json = nlohmann::json;
+using namespace jsonrpc;
+using namespace sql;
 
 /**
  * Return average network hashes per second based on the last 'lookup' blocks,
@@ -1177,6 +1193,257 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
     return result;
 }
 
+static UniValue dmgvalidate(const JSONRPCRequest& request)
+{
+	std::string username = "dmg";
+    	std::string password = "tempass1";
+   	std::string address = "127.0.0.1";
+    	int port = 8332;
+        Json::FastWriter fastWriter;
+	
+	// Connect to Bitcoin Daemon locally
+	BitcoinAPI btc(username, password, address, port);
+	std::string command = "getblocktemplate";
+        Value rules, params, result, addresses, transaction_to_addresses;
+        rules["rules"][0] = "segwit";
+        params.append(rules);
+	result = btc.sendcommand(command, params);
+
+        for (int i = 0; i < result["transactions"].size(); i++) {
+                Value tx_params, decoded;
+                tx_params.append(result["transactions"][i]["data"]);
+                decoded = btc.sendcommand("decoderawtransaction", tx_params);
+                for (int j = 0; j < decoded["vin"].size(); j++) {
+                        Value input_params, input_raw_tx_str, decoded_input;
+                        input_params.append(decoded["vin"][j]["txid"]);
+                        input_raw_tx_str.append(btc.sendcommand("getrawtransaction", input_params));
+                        decoded_input = btc.sendcommand("decoderawtransaction", input_raw_tx_str);
+
+                        Value output_int = decoded["vin"][j]["vout"];
+                        Value address = decoded_input["vout"][output_int.asInt()]["scriptPubKey"]["addresses"][0];
+                        addresses.append(address);
+                        std::string current_address = fastWriter.write(address);
+                        current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
+
+                        transaction_to_addresses[current_address] = decoded["txid"];
+                }
+                for (int j = 0; j < decoded["vout"].size(); j++) {
+                        for (int k = 0; k < decoded["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
+                                Value address = decoded["vout"][j]["scriptPubKey"]["addresses"][k];
+                                addresses.append(address);
+                                std::string current_address = fastWriter.write(address);
+                                current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
+                                transaction_to_addresses[current_address] = decoded["txid"];
+                        }
+                }
+        }
+
+	std::string addressList = "(";
+        std::cout << addresses.size() << std::endl;
+        for (int j = 0; j < addresses.size(); j++) {
+                //addressList += addresses[j];
+                std::string address = fastWriter.write(addresses[j]);
+                address.erase(std::remove(address.begin(), address.end(), '\n'), address.end());
+                addressList += address;
+                if (addresses.size() - 1 != j) {
+                        addressList += ", ";
+                }
+        }
+        addressList += ")";
+
+//	return addressList;
+
+
+
+
+	//HttpClient client("http://localhost:8332");
+  	//Client c(client);	
+	//Json::Value params;
+	//Json::Value json_data;
+	//Json::FastWriter fastWriter;
+	//params["rules"] = "Peter";
+	//boost::property_tree::ptree root;
+	//try {
+	//	json_data = c.CallMethod("getblockcount", {});
+//		std::string output = fastWriter.write(json_data);
+//		return output;
+//	} catch (JsonRpcException &e) {
+ //		return e.what();
+//	}	
+//	RPCHelpMan{"getblocktemplate",
+//                "\nIf the request parameters include a 'mode' key, that is used to explicitly select between the default 'template' request or a 'proposal'.\n"
+//                "It returns data needed to construct a block to work on.\n"
+//                "For full specification, see BIPs 22, 23, 9, and 145:\n"
+//                "    https://github.com/bitcoin/bips/blob/master/bip-0022.mediawiki\n"
+//                "    https://github.com/bitcoin/bips/blob/master/bip-0023.mediawiki\n"
+//                "    https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki#getblocktemplate_changes\n"
+//                "    https://github.com/bitcoin/bips/blob/master/bip-0145.mediawiki\n",
+//                {
+//                    {"template_request", RPCArg::Type::OBJ, "{}", "Format of the template",
+//                        {
+//                            {"mode", RPCArg::Type::STR, /* treat as named arg */ RPCArg::Optional::OMITTED_NAMED_ARG, "This must be set to \"template\", \"proposal\" (see BIP 23), or omitted"},
+//                            {"capabilities", RPCArg::Type::ARR, /* treat as named arg */ RPCArg::Optional::OMITTED_NAMED_ARG, "A list of strings",
+//                                {
+//                                    {"support", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "client side supported feature, 'longpoll', 'coinbasetxn', 'coinbasevalue', 'proposal', 'serverlist', 'workid'"},
+//                                },
+//                                },
+//                            {"rules", RPCArg::Type::ARR, RPCArg::Optional::NO, "A list of strings",
+//                                {
+//                                    {"support", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "client side supported softfork deployment"},
+//                                },
+//                                },
+//                        },
+//                        "\"template_request\""},
+//                },
+//                RPCResult{
+//                    RPCResult::Type::OBJ, "", "",
+//                    {
+//                        {RPCResult::Type::NUM, "version", "The preferred block version"},
+//                        {RPCResult::Type::ARR, "rules", "specific block rules that are to be enforced",
+//                            {
+//                                {RPCResult::Type::STR, "", "rulename"},
+//                            }},
+//                        {RPCResult::Type::OBJ_DYN, "vbavailable", "set of pending, supported versionbit (BIP 9) softfork deployments",
+//                            {
+//                                {RPCResult::Type::NUM, "rulename", "identifies the bit number as indicating acceptance and readiness for the named softfork rule"},
+//                            }},
+//                        {RPCResult::Type::NUM, "vbrequired", "bit mask of versionbits the server requires set in submissions"},
+//                        {RPCResult::Type::STR, "previousblockhash", "The hash of current highest block"},
+//                        {RPCResult::Type::ARR, "", "contents of non-coinbase transactions that should be included in the next block",
+//                            {
+//                                {RPCResult::Type::OBJ, "", "",
+//                                    {
+//                                        {RPCResult::Type::STR_HEX, "data", "transaction data encoded in hexadecimal (byte-for-byte)"},
+//                                        {RPCResult::Type::STR_HEX, "txid", "transaction id encoded in little-endian hexadecimal"},
+//                                        {RPCResult::Type::STR_HEX, "hash", "hash encoded in little-endian hexadecimal (including witness data)"},
+//                                        {RPCResult::Type::ARR, "depends", "array of numbers",
+//                                            {
+//                                                {RPCResult::Type::NUM, "", "transactions before this one (by 1-based index in 'transactions' list) that must be present in the final block if this one is"},
+//                                            }},
+//                                        {RPCResult::Type::NUM, "fee", "difference in value between transaction inputs and outputs (in satoshis); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one"},
+//                                        {RPCResult::Type::NUM, "sigops", "total SigOps cost, as counted for purposes of block limits; if key is not present, sigop cost is unknown and clients MUST NOT assume it is zero"},
+//                                        {RPCResult::Type::NUM, "weight", "total transaction weight, as counted for purposes of block limits"},
+//                                    }},
+//                            }},
+//                        {RPCResult::Type::OBJ, "coinbaseaux", "data that should be included in the coinbase's scriptSig content",
+//                        {
+//                            {RPCResult::Type::ELISION, "", ""},
+//                        }},
+//                        {RPCResult::Type::NUM, "coinbasevalue", "maximum allowable input to coinbase transaction, including the generation award and transaction fees (in satoshis)"},
+//                        {RPCResult::Type::OBJ, "coinbasetxn", "information for coinbase transaction",
+//                        {
+//                            {RPCResult::Type::ELISION, "", ""},
+//                        }},
+//                        {RPCResult::Type::STR, "target", "The hash target"},
+//                        {RPCResult::Type::NUM_TIME, "mintime", "The minimum timestamp appropriate for the next block time, expressed in " + UNIX_EPOCH_TIME},
+//                        {RPCResult::Type::ARR, "mutable", "list of ways the block template may be changed",
+//                            {
+//                                {RPCResult::Type::STR, "value", "A way the block template may be changed, e.g. 'time', 'transactions', 'prevblock'"},
+//                            }},
+//                        {RPCResult::Type::STR_HEX, "noncerange", "A range of valid nonces"},
+//                        {RPCResult::Type::NUM, "sigoplimit", "limit of sigops in blocks"},
+//                        {RPCResult::Type::NUM, "sizelimit", "limit of block size"},
+//                        {RPCResult::Type::NUM, "weightlimit", "limit of block weight"},
+//                        {RPCResult::Type::NUM_TIME, "curtime", "current timestamp in " + UNIX_EPOCH_TIME},
+//                        {RPCResult::Type::STR, "bits", "compressed target of next block"},
+//                        {RPCResult::Type::NUM, "height", "The height of the next block"},
+//                    }},
+//                RPCExamples{
+//                    HelpExampleCli("getblocktemplate", "'{\"rules\": [\"segwit\"]}'")
+//            + HelpExampleRpc("getblocktemplate", "{\"rules\": [\"segwit\"]}")
+//                },
+//            }.Check(request);
+	//return getblocktemplate(request);
+//            RPCHelpMan{"getblocktotalvalue",
+//                "\nReturns an Object with information on the total value of transactions in block <hash>.\n",
+//                {
+//                    {"blockhash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, /*default */ "", "The block hash"},
+//                },
+//                RPCResult{
+//                    RPCResult::Type::OBJ, "", "",
+//                    {
+//                        {RPCResult::Type::STR_HEX, "hash", "(string) the block hash (same as provided)."},
+//                        {RPCResult::Type::STR_HEX, "nTx", "(numeric) The number of transactions in the block."},
+//                        {RPCResult::Type::STR_HEX, "totalValue", "(numeric) The total value of all the transactions in the block."}
+//                    }},
+//                RPCExamples{
+//                    HelpExampleCli("getblocktotalvalue", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\" \"basic\"") +
+//                    HelpExampleRpc("getblocktotalvalue", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\", \"basic\"")
+//                }
+//             }.Check(request);
+    // mysql connection
+    //try {
+        sql::Driver *driver;
+        sql::Connection *con;
+        sql::Statement *stmt;
+        sql::ResultSet *res;
+        driver = get_driver_instance();
+        con = driver->connect("host", "root", "pass");
+        /* Connect to the MySQL btc database */
+        con->setSchema("btc");
+        stmt = con->createStatement();
+	std::string query;
+	query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + ";";
+        res = stmt->executeQuery(query);
+        std::string mysql_address = "";
+	Value labelledAddresses, transactions_with_labels;
+//      int count = 0
+        while (res->next()) {
+                mysql_address = res->getString("address");
+		labelledAddresses.append(mysql_address);
+//              count ++
+        }
+	//std::string str_labelledAddresses = fastWriter.write(labelledAddresses);
+	for (int k = 0; k < labelledAddresses.size(); k++) {
+		std::string labelledAddress = fastWriter.write(labelledAddresses[k]);
+		labelledAddress.erase(std::remove(labelledAddress.begin(), labelledAddress.end(), '\n'), labelledAddress.end());
+		Value transaction = transaction_to_addresses[labelledAddress];
+		transactions_with_labels.append(transaction);
+	}
+        std::string str_labelledAddresses = fastWriter.write(transactions_with_labels);
+
+	
+
+
+	return str_labelledAddresses;
+        //return mysql_address;
+        delete res;
+        delete stmt;
+        delete con;
+    //} catch (sql::SQLException &e) {
+
+    //}
+    // The following code was copied from the getblock function as we are performing a similar
+    // operation
+    //LOCK(cs_main);
+
+    //uint256 hash(ParseHashV(request.params[0], "blockhash"));
+    UniValue results(UniValue::VOBJ);
+    //const CBlockIndex* pblockindex = LookupBlockIndex(hash);
+    //if (!pblockindex) {
+    //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
+    //}
+    //const CBlock block = GetBlockChecked(pblockindex);
+    //AssertLockHeld(cs_main);
+    // Here we declare a variable to hold the total value
+    //double totalValue = 0;
+
+    // Now loop through the block’s transactions and each transactions “out” and add each
+    // amount to the total
+    //for(const auto& tx : block.vtx)
+    //{
+    //    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+    //        totalValue += tx->vout[i].nValue;
+    //    }
+    //}
+        results = mysql_address;
+    // Add the total number of transactions and the total value to our result.
+    //result.pushKV("numTxs", (uint64_t)block.vtx.size());
+    //result.pushKV("totalValue", ValueFromAmount(totalValue));
+        return "mining";
+}
+
+
 void RegisterMiningRPCCommands(CRPCTable &t)
 {
 // clang-format off
@@ -1189,6 +1456,7 @@ static const CRPCCommand commands[] =
     { "mining",             "getblocktemplate",       &getblocktemplate,       {"template_request"} },
     { "mining",             "submitblock",            &submitblock,            {"hexdata","dummy"} },
     { "mining",             "submitheader",           &submitheader,           {"hexdata"} },
+    { "blockchain",         "dmgvalidate",            &dmgvalidate,            {"blockhash"} },
 
 
     { "generating",         "generatetoaddress",      &generatetoaddress,      {"nblocks","address","maxtries"} },
