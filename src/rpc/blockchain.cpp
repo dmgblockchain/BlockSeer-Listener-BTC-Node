@@ -6,6 +6,7 @@
 #include <rpc/blockchain.h>
 
 #include <amount.h>
+#include <bitcoinapi/bitcoinapi.h>
 #include <blockfilter.h>
 #include <chain.h>
 #include <chainparams.h>
@@ -2363,6 +2364,103 @@ UniValue dumptxoutset(const JSONRPCRequest& request)
     return result;
 }
 
+// print the txs in a given block
+// static UniValue getblocktxes(const JSONRPCRequest& request) {
+//     if (fHelp || params.size() < 1 || params.size() > 2) {
+//         throw runtime_error(
+//             "getblocktxes \"hash\"\n"
+//             "\nreturns an object contains all the txs in a block.\n"
+//             "\nArguments:\n"
+//             "1. \"hash\"          (string, required) The block hash\n"
+//             "\nResult:\n"
+//                 "[{\n"
+//                 "  \"txid\" : \"id\",        (string) The transaction id (same as provided)\n"
+//                 "  \"version\" : n,          (numeric) The version\n"
+//                 "  \"locktime\" : ttt,       (numeric) The lock time\n"
+//                 "  \"vin\" : [               (array of json objects)\n"
+//                 "     {\n"
+//                 "       \"txid\": \"id\",    (string) The transaction id\n"
+//                 "       \"vout\": n,         (numeric) \n"
+//                 "       \"scriptSig\": {     (json object) The script\n"
+//                 "         \"asm\": \"asm\",  (string) asm\n"
+//                 "         \"hex\": \"hex\"   (string) hex\n"
+//                 "       },\n"
+//                 "       \"sequence\": n      (numeric) The script sequence number\n"
+//                 "     }\n"
+//                 "     ,...\n"
+//                 "  ],\n"
+//                 "  \"vout\" : [              (array of json objects)\n"
+//                 "     {\n"
+//                 "       \"value\" : x.xxx,            (numeric) The value in btc\n"
+//                 "       \"n\" : n,                    (numeric) index\n"
+//                 "       \"scriptPubKey\" : {          (json object)\n"
+//                 "         \"asm\" : \"asm\",          (string) the asm\n"
+//                 "         \"hex\" : \"hex\",          (string) the hex\n"
+//                 "         \"reqSigs\" : n,            (numeric) The required sigs\n"
+//                 "         \"type\" : \"pubkeyhash\",  (string) The type, eg 'pubkeyhash'\n"
+//                 "         \"addresses\" : [           (json array of string)\n"
+//                 "           \"bitcoinaddress\"        (string) bitcoin address\n"
+//                 "           ,...\n"
+//                 "         ]\n"
+//                 "       }\n"
+//                 "     }\n"
+//                 "     ,...\n"
+//                 "  ],\n"
+//                 "  \"blockhash\" : \"hash\",   (string) the block hash\n"
+//                 "  \"confirmations\" : n,      (numeric) The confirmations\n"
+//                 "  \"time\" : ttt,             (numeric) The transaction time in seconds since epoch (Jan 1 1970 GMT)\n"
+//                 "  \"blocktime\" : ttt         (numeric) The block time in seconds since epoch (Jan 1 1970 GMT)\n"
+//                 "}, {...}]"
+// //            + HelpExampleCli("getblocktxes", "0000000000000000cb14aa4c3fdd204790e56a9a5d8c7ba3fc84a4fa945fcceb")
+// //            + HelpExampleRpc("getblocktxes", "0000000000000000cb14aa4c3fdd204790e56a9a5d8c7ba3fc84a4fa945fcceb")
+//         );
+//     }
+    // std::string username = "dmg";
+    // std::string password = "tempass1";
+   	// std::string address = "127.0.0.1";
+    // int port = 8332;
+    // Json::FastWriter fastWriter;
+	// // Connect to Bitcoin Daemon locally
+	// BitcoinAPI btc(username, password, address, port);
+
+    // // Initialize Variables
+    // Value raw_transaction, decoded_transaction;
+    // UniValue txns(UniValue::VARR);
+    // UniValue block(UniValue::VOBJ);
+
+    // // get the block and iterate through transaction hashes
+    // block = getblock(request);
+    // for (int i = 0; i < block["tx"].size(); i++) {
+    //     // decode each transaction and add it to txns array
+    //     raw_transaction = btc.sendcommand("getrawtransaction", block["tx"][i]);
+    //     decoded_transaction = btc.sendcommand("decoderawtransaction", raw_transaction);
+    //     txns.push_back(decoded_transaction);
+    // }
+    // return txns;
+    // uint256 hash(ParseHashV(request.params[0], "blockhash"));
+    // Array ret;
+    // // std::string strHash = params[0].get_str();
+    // // uint256 hash(strHash);
+
+    // BlockMap::const_iterator mi = mapBlockIndex.find(hash);
+    // if (mi == mapBlockIndex.end()) {
+    //     throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
+    // }
+
+    // CBlock block;
+    // CBlockIndex* pblockindex = mapBlockIndex[hash];
+    // ReadBlockFromDisk(block, pblockindex);
+
+    // BOOST_FOREACH(CTransaction& tx, block.vtx)
+    // {
+    //     Object entry;
+    //     TxToJSON(tx, hash, entry);
+    //     ret.push_back(entry);
+    // }
+    // result = ret;
+// }
+
+
 //static UniValue dmgvalidate(const JSONRPCRequest& request)
 //{
 //            RPCHelpMan{"getblocktotalvalue",
@@ -2463,7 +2561,7 @@ static const CRPCCommand commands[] =
     { "blockchain",         "pruneblockchain",        &pruneblockchain,        {"height"} },
     { "blockchain",         "savemempool",            &savemempool,            {} },
     { "blockchain",         "verifychain",            &verifychain,            {"checklevel","nblocks"} },
-//    { "blockchain",         "dmgvalidate",            &dmgvalidate,            {"blockhash"} },
+    // { "blockchain",         "getblocktxes",           &getblocktxes,            {"blockhash"} },
 
     { "blockchain",         "preciousblock",          &preciousblock,          {"blockhash"} },
     { "blockchain",         "scantxoutset",           &scantxoutset,           {"action", "scanobjects"} },

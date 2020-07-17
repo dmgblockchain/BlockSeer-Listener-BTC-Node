@@ -3,6 +3,27 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+
+#include <coins.h>
+#include <index/txindex.h>
+#include <node/coin.h>
+#include <node/psbt.h>
+#include <node/transaction.h>
+#include <policy/policy.h>
+#include <policy/rbf.h>
+#include <primitives/transaction.h>
+#include <psbt.h>
+#include <random.h>
+#include <rpc/rawtransaction_util.h>
+#include <rpc/server.h>
+#include <rpc/util.h>
+#include <script/sign.h>
+#include <script/standard.h>
+#include <uint256.h>
+#include <util/moneystr.h>
+
+#include <numeric>
+
 #include <amount.h>
 #include <bitcoinapi/bitcoinapi.h>
 #include <chain.h>
@@ -500,6 +521,96 @@ static std::string gbt_vb_name(const Consensus::DeploymentPos pos) {
     return s;
 }
 
+
+static void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
+{
+    // Call into TxToUniv() in bitcoin-common to decode the transaction hex.
+    //
+    // Blockchain contextual information (confirmations and blocktime) is not
+    // available to code in bitcoin-common, so we query them here and push the
+    // data into the returned UniValue.
+    TxToUniv(tx, uint256(), entry, true, RPCSerializationFlags());
+
+    if (!hashBlock.IsNull()) {
+        LOCK(cs_main);
+
+        entry.pushKV("blockhash", hashBlock.GetHex());
+        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+        if (pindex) {
+            if (::ChainActive().Contains(pindex)) {
+                entry.pushKV("confirmations", 1 + ::ChainActive().Height() - pindex->nHeight);
+                entry.pushKV("time", pindex->GetBlockTime());
+                entry.pushKV("blocktime", pindex->GetBlockTime());
+            }
+            else
+                entry.pushKV("confirmations", 0);
+        }
+    }
+}
+
+static UniValue getrawtransaction(uint256 hash)
+{
+
+    bool in_active_chain = true;
+    CBlockIndex* blockindex = nullptr;
+
+    if (hash == Params().GenesisBlock().hashMerkleRoot) {
+        // Special exception for the genesis block coinbase transaction
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "The genesis block coinbase is not considered an ordinary transaction and cannot be retrieved");
+    }
+
+    // Accept either a bool (true) or a num (>=1) to indicate verbose output.
+    bool fVerbose = false;
+
+
+    bool f_txindex_ready = false;
+    if (g_txindex && !blockindex) {
+        f_txindex_ready = g_txindex->BlockUntilSyncedToCurrentChain();
+    }
+
+    CTransactionRef tx;
+    uint256 hash_block;
+    if (!GetTransaction(hash, tx, Params().GetConsensus(), hash_block, blockindex)) {
+        std::string errmsg;
+        if (blockindex) {
+            if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
+                throw JSONRPCError(RPC_MISC_ERROR, "Block not available");
+            }
+            errmsg = "No such transaction found in the provided block";
+        } else if (!g_txindex) {
+            errmsg = "No such mempool transaction. Use -txindex or provide a block hash to enable blockchain transaction queries";
+        } else if (!f_txindex_ready) {
+            errmsg = "No such mempool transaction. Blockchain transactions are still in the process of being indexed";
+        } else {
+            errmsg = "No such mempool or blockchain transaction";
+        }
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, errmsg + ". Use gettransaction for wallet transactions.");
+    }
+
+    if (!fVerbose) {
+        return EncodeHexTx(*tx, RPCSerializationFlags());
+    }
+
+    UniValue result(UniValue::VSTR);
+    // if (blockindex) result.pushKV("in_active_chain", in_active_chain);
+    TxToJSON(*tx, hash_block, result);
+    return result;
+}
+
+static UniValue decoderawtransaction(std::string request)
+{
+    CMutableTransaction mtx;
+
+    if (!DecodeHexTx(mtx, request, false, true)) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
+    }
+
+    UniValue result(UniValue::VOBJ);
+    TxToUniv(CTransaction(std::move(mtx)), uint256(), result, false);
+
+    return result;
+}
+
 static UniValue getblocktemplate(const JSONRPCRequest& request)
 {
             RPCHelpMan{"getblocktemplate",
@@ -756,12 +867,39 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     UniValue aCaps(UniValue::VARR); aCaps.push_back("proposal");
 
     UniValue transactions(UniValue::VARR);
+    UniValue addresses(UniValue::VARR);
     std::map<uint256, int64_t> setTxIndex;
     int i = 0;
+
+    //dmg
+    Value transactionHash, transactionData;
+    UniValue decodedTransactions(UniValue::VARR);
+
+    std::string username = "dmg";
+    std::string password = "tempass1";
+    std::string address = "127.0.0.1";
+    int port = 8332;
+
+    // Connect to Bitcoin Daemon locally
+    BitcoinAPI btc(username, password, address, port);
+    Json::FastWriter fastWriter;
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    driver = get_driver_instance();
+    con = driver->connect("ws-bitcoin.clueaywb0zyp.us-west-2.rds.amazonaws.com", "root", "letmein2");
+    /* Connect to the MySQL btc database */
+    con->setSchema("btc");
+    stmt = con->createStatement();
+	std::string query;
     for (const auto& it : pblock->vtx) {
         const CTransaction& tx = *it;
         uint256 txHash = tx.GetHash();
         setTxIndex[txHash] = i++;
+
+        // std::string address = fastWriter.write(tx);
+        // return address;
 
         if (tx.IsCoinBase())
             continue;
@@ -771,6 +909,94 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         entry.pushKV("data", EncodeHexTx(tx));
         entry.pushKV("txid", txHash.GetHex());
         entry.pushKV("hash", tx.GetWitnessHash().GetHex());
+
+        //dmg
+        UniValue decodedTransaction(UniValue::VOBJ);
+        TxToUniv(tx, uint256(), decodedTransaction, false);
+        decodedTransactions.push_back(decodedTransaction);
+        // for (int i = 0; i < decodedTransaction["vin"].size(); i++) {
+        //     uint256 input = ParseHashV(decodedTransaction["vin"][i]["txid"], "parameter 1");
+        //     UniValue rawTransaction = getrawtransaction(input);
+        //     UniValue decodedInput = decoderawtransaction(rawTransaction.get_str());
+        //     int output_int = decodedTransaction["vin"][i]["vout"].asInt();
+        //     UniValue inputAddresses = decodedInput["vout"][output_int]["scriptPubKey"]["addresses"][0];
+        // }
+        
+
+
+        // dmg.append(txHash.GetHex());
+        // transactionHash = txHash.GetHex();
+        
+        // Value result, addresses, transaction_to_addresses, get_raw_tx_params, decode_tx_params, decoded;
+
+        // get_raw_tx_params.append(transactionHash);
+        // // return decoderawtransaction(getrawtransaction(tx.GetHash()));
+
+        // decode_tx_params.append(btc.sendcommand("getrawtransaction", get_raw_tx_params));
+        // decoded = btc.sendcommand("decoderawtransaction", decode_tx_params);
+        
+        // INPUTS
+        // for (int j = 0; j < decoded["vin"].size(); j++) {
+            // Input addresses are not included in decoded raw transaction
+
+
+
+            // Value input_tx_params, input_raw_tx, decoded_input_tx;
+            // // need to code the previous transaction and check the outputs against this input
+            // input_tx_params.append(decoded["vin"][j]["txid"]);
+            // input_raw_tx.append(btc.sendcommand("getrawtransaction", input_tx_params));
+            // decoded_input_tx = btc.sendcommand("decoderawtransaction", input_raw_tx);
+            // Value output_int = decoded["vin"][j]["vout"];
+            // // This is the input address as a JSON object
+            // Value address_obj = decoded_input_tx["vout"][output_int.asInt()]["scriptPubKey"]["addresses"][0];
+            // std::string address = fastWriter.write(address_obj);
+            // address.erase(std::remove(address.begin(), address.end(), '\n'), address.end());
+
+
+
+
+    //         query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address = " + address_str + ";";
+    //         res = stmt->executeQuery(query);
+    //         std::string mysql_address = "";
+    //         int mysql_category;
+    //         // Value labelledAddresses, transactions_with_labels;
+    // //      int count = 0
+    //         while (res->next()) {
+    //                 mysql_address = res->getString("address");
+    //                 mysql_category = res->getInt("category_id");
+    //         // labelledAddresses.append(mysql_address);
+    // //              count ++
+    //         }
+            
+    //         UniValue results(UniValue::VOBJ);
+    //         results = mysql_category;
+    //         // if (mysql_category == 37) {
+    //         //     return results;
+    //         // }
+    //         return results;
+
+
+
+
+            // addresses.append(address);
+            // std::string current_address = fastWriter.write(address);
+            // current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
+
+            // transaction_to_addresses[current_address] = decoded["txid"];
+        // }
+       
+    //     // NEEDED
+    //     // OUTPUTS
+        // for (int j = 0; j < decoded["vout"].size(); j++) {
+        //     for (int k = 0; k < decoded["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
+        //             Value address = decoded["vout"][j]["scriptPubKey"]["addresses"][k];
+        //             addresses.append(address);
+        //             std::string current_address = fastWriter.write(address);
+        //             current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
+        //             transaction_to_addresses[current_address] = decoded["txid"];
+        //     }
+        // }    
+
 
         UniValue deps(UniValue::VARR);
         for (const CTxIn &in : tx.vin)
@@ -793,6 +1019,106 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         transactions.push_back(entry);
     }
 
+    UniValue inputs(UniValue::VARR);
+    UniValue outputs(UniValue::VARR);
+    UniValue outputsStaging(UniValue::VOBJ);
+
+    UniValue transactionToAddress(UniValue::VOBJ);
+    // get inputs
+    for (int i = 0; i < decodedTransactions.size(); i++) {
+        // Inputs
+        for (int j = 0; j < decodedTransactions[i]["vin"].size(); j++) {
+            inputs.push_back(decodedTransactions[i]["vin"][j]);
+
+            // uint256 input = ParseHashV(decodedTransactions[i]["vin"][j]["txid"], "parameter 1");
+            // UniValue rawTransaction = getrawtransaction(input);
+            // UniValue decodedInput = decoderawtransaction(rawTransaction.get_str());
+            // int output_int = decodedTransactions[i]["vin"][j]["vout"].get_int();
+            // UniValue inputAddress = decodedInput["vout"][output_int]["scriptPubKey"]["addresses"][0];
+            // addresses.push_back(inputAddress);
+        }
+        
+        // // Outputs
+        for (int j = 0; j < decodedTransactions[i]["vout"].size(); j++) {
+            std::string txid = decodedTransactions[i]["txid"].get_str();
+            outputsStaging = decodedTransactions[i]["vout"][j];
+            outputsStaging.pushKV("txid", txid);
+            // outputs.push_back(decodedTransactions[i]["vout"][j]);
+            outputs.push_back(outputsStaging);
+        //     for (int k = 0; k < decodedTransactions[i]["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
+        //             UniValue outputAddress = decodedTransactions[i]["vout"][j]["scriptPubKey"]["addresses"][k];
+        //             addresses.push_back(outputAddress);
+
+        //             // transaction_to_addresses[current_address] = decoded["txid"];
+        //     }
+        }  
+    }
+    for (int j = 0; j < inputs.size(); j++) {
+        uint256 input = ParseHashV(inputs[j]["txid"], "parameter 1");
+        UniValue rawTransaction = getrawtransaction(input);
+        UniValue decodedInput = decoderawtransaction(rawTransaction.get_str());
+        int output_int = inputs[j]["vout"].get_int();
+        UniValue inputAddress = decodedInput["vout"][output_int]["scriptPubKey"]["addresses"][0];
+        addresses.push_back(inputAddress);
+        transactionToAddress.pushKV(inputAddress.get_str(), inputs[j]["txid"]);
+    }
+
+    for (int j = 0; j < outputs.size(); j++) {
+        for (int k = 0; k < outputs[j]["scriptPubKey"]["addresses"].size(); k++) {
+            UniValue outputAddress = outputs[j]["scriptPubKey"]["addresses"][k];
+            addresses.push_back(outputAddress);
+            transactionToAddress.pushKV(outputAddress.get_str(), outputs[j]["txid"]);
+        }
+    }
+
+    std::string addressList = "(";
+    for (int i = 0; i < addresses.size(); i++) {
+        //addressList += addresses[j];
+        std::string address = addresses[i].get_str();
+        addressList += "\"" + address + "\"";
+        if (addresses.size() - 1 != i) {
+                addressList += ", ";
+        }
+    }
+    addressList += ")";
+	query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + " AND category_id IS NOT NULL;";
+    res = stmt->executeQuery(query);
+    std::string mysql_address;
+    
+	Value transactions_with_labels;
+
+    UniValue labelledAddresses(UniValue::VARR);
+    UniValue labelledTransactions(UniValue::VARR);
+
+    while (res->next()) {
+        mysql_address = res->getString("address");
+        int mysql_category = res->getInt("category_id");
+        if (mysql_category == 3 || mysql_category == 5 || mysql_category == 9 || mysql_category == 14 || mysql_category == 20 || mysql_category == 25 || mysql_category ==  30 || mysql_category == 32 || mysql_category == 34 || mysql_category == 35 || mysql_category == 37) {
+            labelledAddresses.push_back(mysql_address);
+            labelledTransactions.push_back(transactionToAddress[mysql_address]);
+        }
+    }
+    // UniValue test(UniValue::VOBJ);
+    UniValue verifiedTransactions(UniValue::VARR);
+    int removedTransactions = 0;
+    // test.pushKV("beforeCheck", transactions.size());
+
+    for (int i = 0; i < transactions.size(); i++) {
+        bool exclude = false;
+
+        for (int j = 0; j <labelledTransactions.size(); j++) {
+            if (transactions[i]["txid"].get_str() == labelledTransactions[j].get_str()) {
+                exclude = true;
+                removedTransactions++;
+            }    
+        }
+        if (!exclude) {
+            verifiedTransactions.push_back(transactions[i]);
+        }
+
+    }
+    // test.pushKV("afterCheck", verifiedTransactions.size());
+    // return test;
     UniValue aux(UniValue::VOBJ);
 
     arith_uint256 hashTarget = arith_uint256().SetCompact(pblock->nBits);
@@ -863,7 +1189,8 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     }
 
     result.pushKV("previousblockhash", pblock->hashPrevBlock.GetHex());
-    result.pushKV("transactions", transactions);
+    // result.pushKV("transactions", transactions);
+    result.pushKV("transactions", verifiedTransactions);
     result.pushKV("coinbaseaux", aux);
     result.pushKV("coinbasevalue", (int64_t)pblock->vtx[0]->vout[0].nValue);
     result.pushKV("longpollid", ::ChainActive().Tip()->GetBlockHash().GetHex() + ToString(nTransactionsUpdatedLast));
@@ -891,6 +1218,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     if (!pblocktemplate->vchCoinbaseCommitment.empty()) {
         result.pushKV("default_witness_commitment", HexStr(pblocktemplate->vchCoinbaseCommitment.begin(), pblocktemplate->vchCoinbaseCommitment.end()));
     }
+    result.pushKV("removedTransactions", removedTransactions);
 
     return result;
 }
@@ -1195,81 +1523,98 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
 
 static UniValue dmgvalidate(const JSONRPCRequest& request)
 {
+     sql::Driver *driver;
+    sql::Connection *con;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    driver = get_driver_instance();
+    con = driver->connect("ws-bitcoin.clueaywb0zyp.us-west-2.rds.amazonaws.com", "root", "letmein2");
+    /* Connect to the MySQL btc database */
+    con->setSchema("btc");
+    stmt = con->createStatement();
+	std::string query;
+	
 	std::string username = "dmg";
-    	std::string password = "tempass1";
+    std::string password = "tempass1";
    	std::string address = "127.0.0.1";
-    	int port = 8332;
-        Json::FastWriter fastWriter;
+    int port = 8332;
+    Json::FastWriter fastWriter;
 	
 	// Connect to Bitcoin Daemon locally
 	BitcoinAPI btc(username, password, address, port);
 	std::string command = "getblocktemplate";
-        Value rules, params, result, addresses, transaction_to_addresses;
-        rules["rules"][0] = "segwit";
-        params.append(rules);
+    Value rules, params, result, addresses, transaction_to_addresses;
+    rules["rules"][0] = "segwit";
+    params.append(rules);
 	result = btc.sendcommand(command, params);
+    for (int i = 0; i < result["transactions"].size(); i++) {
+            Value tx_params, decoded;
+            tx_params.append(result["transactions"][i]["data"]);
+            decoded = btc.sendcommand("decoderawtransaction", tx_params);
+            // INPUTS
+            for (int j = 0; j < decoded["vin"].size(); j++) {
+                    Value input_params, input_raw_tx_str, decoded_input;
+                    input_params.append(decoded["vin"][j]["txid"]);
+                    input_raw_tx_str.append(btc.sendcommand("getrawtransaction", input_params));
+                    decoded_input = btc.sendcommand("decoderawtransaction", input_raw_tx_str);
+                    Value output_int = decoded["vin"][j]["vout"];
+                    Value address = decoded_input["vout"][output_int.asInt()]["scriptPubKey"]["addresses"][0];
+                    std::string address_str = fastWriter.write(address);
+                    address_str.erase(std::remove(address_str.begin(), address_str.end(), '\n'), address_str.end());
+                    query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address = " + address_str + ";";
+                    res = stmt->executeQuery(query);
+                    std::string mysql_address = "";
+                    int mysql_category;
+                    // Value labelledAddresses, transactions_with_labels;
+            //      int count = 0
+                    while (res->next()) {
+                            mysql_address = res->getString("address");
+                            mysql_category = res->getInt("category_id");
+                    // labelledAddresses.append(mysql_address);
+            //              count ++
+                    }
+                    
+                    UniValue results(UniValue::VOBJ);
+                    results = mysql_category;
+                    // if (mysql_category == 37) {
+                    //     return results;
+                    // }
+                    return results;
+                    addresses.append(address);
+                    std::string current_address = fastWriter.write(address);
+                    current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
 
-        for (int i = 0; i < result["transactions"].size(); i++) {
-                Value tx_params, decoded;
-                tx_params.append(result["transactions"][i]["data"]);
-                decoded = btc.sendcommand("decoderawtransaction", tx_params);
-                for (int j = 0; j < decoded["vin"].size(); j++) {
-                        Value input_params, input_raw_tx_str, decoded_input;
-                        input_params.append(decoded["vin"][j]["txid"]);
-                        input_raw_tx_str.append(btc.sendcommand("getrawtransaction", input_params));
-                        decoded_input = btc.sendcommand("decoderawtransaction", input_raw_tx_str);
+                    transaction_to_addresses[current_address] = decoded["txid"];
+            }
+    }
+        // NEEDED
+        // OUTPUTS
+    //         for (int j = 0; j < decoded["vout"].size(); j++) {
+    //                 for (int k = 0; k < decoded["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
+    //                         Value address = decoded["vout"][j]["scriptPubKey"]["addresses"][k];
+    //                         addresses.append(address);
+    //                         std::string current_address = fastWriter.write(address);
+    //                         current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
+    //                         transaction_to_addresses[current_address] = decoded["txid"];
+    //                 }
+    //         }
+    // }
 
-                        Value output_int = decoded["vin"][j]["vout"];
-                        Value address = decoded_input["vout"][output_int.asInt()]["scriptPubKey"]["addresses"][0];
-                        addresses.append(address);
-                        std::string current_address = fastWriter.write(address);
-                        current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
-
-                        transaction_to_addresses[current_address] = decoded["txid"];
-                }
-                for (int j = 0; j < decoded["vout"].size(); j++) {
-                        for (int k = 0; k < decoded["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
-                                Value address = decoded["vout"][j]["scriptPubKey"]["addresses"][k];
-                                addresses.append(address);
-                                std::string current_address = fastWriter.write(address);
-                                current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
-                                transaction_to_addresses[current_address] = decoded["txid"];
-                        }
-                }
-        }
-
-	std::string addressList = "(";
-        std::cout << addresses.size() << std::endl;
-        for (int j = 0; j < addresses.size(); j++) {
-                //addressList += addresses[j];
-                std::string address = fastWriter.write(addresses[j]);
-                address.erase(std::remove(address.begin(), address.end(), '\n'), address.end());
-                addressList += address;
-                if (addresses.size() - 1 != j) {
-                        addressList += ", ";
-                }
-        }
-        addressList += ")";
-
-//	return addressList;
+	// std::string addressList = "(";
+    //     std::cout << addresses.size() << std::endl;
+    //     for (int j = 0; j < addresses.size(); j++) {
+    //             //addressList += addresses[j];
+    //             std::string address = fastWriter.write(addresses[j]);
+    //             address.erase(std::remove(address.begin(), address.end(), '\n'), address.end());
+    //             addressList += address;
+    //             if (addresses.size() - 1 != j) {
+    //                     addressList += ", ";
+    //             }
+    //     }
+    //     addressList += ")";
 
 
 
-
-	//HttpClient client("http://localhost:8332");
-  	//Client c(client);	
-	//Json::Value params;
-	//Json::Value json_data;
-	//Json::FastWriter fastWriter;
-	//params["rules"] = "Peter";
-	//boost::property_tree::ptree root;
-	//try {
-	//	json_data = c.CallMethod("getblockcount", {});
-//		std::string output = fastWriter.write(json_data);
-//		return output;
-//	} catch (JsonRpcException &e) {
- //		return e.what();
-//	}	
 //	RPCHelpMan{"getblocktemplate",
 //                "\nIf the request parameters include a 'mode' key, that is used to explicitly select between the default 'template' request or a 'proposal'.\n"
 //                "It returns data needed to construct a block to work on.\n"
@@ -1373,43 +1718,53 @@ static UniValue dmgvalidate(const JSONRPCRequest& request)
 //             }.Check(request);
     // mysql connection
     //try {
-        sql::Driver *driver;
-        sql::Connection *con;
-        sql::Statement *stmt;
-        sql::ResultSet *res;
-        driver = get_driver_instance();
-        con = driver->connect("host", "root", "pass");
-        /* Connect to the MySQL btc database */
-        con->setSchema("btc");
-        stmt = con->createStatement();
-	std::string query;
-	query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + ";";
-        res = stmt->executeQuery(query);
-        std::string mysql_address = "";
-	Value labelledAddresses, transactions_with_labels;
-//      int count = 0
-        while (res->next()) {
-                mysql_address = res->getString("address");
-		labelledAddresses.append(mysql_address);
-//              count ++
-        }
-	//std::string str_labelledAddresses = fastWriter.write(labelledAddresses);
-	for (int k = 0; k < labelledAddresses.size(); k++) {
-		std::string labelledAddress = fastWriter.write(labelledAddresses[k]);
-		labelledAddress.erase(std::remove(labelledAddress.begin(), labelledAddress.end(), '\n'), labelledAddress.end());
-		Value transaction = transaction_to_addresses[labelledAddress];
-		transactions_with_labels.append(transaction);
-	}
-        std::string str_labelledAddresses = fastWriter.write(transactions_with_labels);
+
+//NEEEDED
+//         sql::Driver *driver;
+//         sql::Connection *con;
+//         sql::Statement *stmt;
+//         sql::ResultSet *res;
+//         driver = get_driver_instance();
+//         con = driver->connect("ws-bitcoin.clueaywb0zyp.us-west-2.rds.amazonaws.com", "root", "letmein2");
+//         /* Connect to the MySQL btc database */
+//         con->setSchema("btc");
+//         stmt = con->createStatement();
+// 	std::string query;
+// 	query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + ";";
+//         res = stmt->executeQuery(query);
+//         std::string mysql_address = "";
+// 	Value labelledAddresses, transactions_with_labels;
+// //      int count = 0
+//         while (res->next()) {
+//                 mysql_address = res->getString("address");
+// 		labelledAddresses.append(mysql_address);
+// //              count ++
+//         }
+// 	//std::string str_labelledAddresses = fastWriter.write(labelledAddresses);
+// 	for (int k = 0; k < labelledAddresses.size(); k++) {
+// 		std::string labelledAddress = fastWriter.write(labelledAddresses[k]);
+// 		labelledAddress.erase(std::remove(labelledAddress.begin(), labelledAddress.end(), '\n'), labelledAddress.end());
+// 		Value transaction = transaction_to_addresses[labelledAddress];
+// 		transactions_with_labels.append(transaction);
+// // TODO CHECK CATEGORY_ID
+// 	}
+//         std::string str_labelledAddresses = fastWriter.write(transactions_with_labels);
 
 	
 
 
-	return str_labelledAddresses;
-        //return mysql_address;
-        delete res;
-        delete stmt;
-        delete con;
+// 	return str_labelledAddresses;
+//         //return mysql_address;
+//         delete res;
+//         delete stmt;
+//         delete con;
+
+
+
+
+
+
+
     //} catch (sql::SQLException &e) {
 
     //}
@@ -1418,7 +1773,13 @@ static UniValue dmgvalidate(const JSONRPCRequest& request)
     //LOCK(cs_main);
 
     //uint256 hash(ParseHashV(request.params[0], "blockhash"));
-    UniValue results(UniValue::VOBJ);
+
+
+
+    // UniValue results(UniValue::VOBJ);
+
+
+
     //const CBlockIndex* pblockindex = LookupBlockIndex(hash);
     //if (!pblockindex) {
     //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
@@ -1436,7 +1797,13 @@ static UniValue dmgvalidate(const JSONRPCRequest& request)
     //        totalValue += tx->vout[i].nValue;
     //    }
     //}
-        results = mysql_address;
+
+
+
+        // results = mysql_address;
+
+
+
     // Add the total number of transactions and the total value to our result.
     //result.pushKV("numTxs", (uint64_t)block.vtx.size());
     //result.pushKV("totalValue", ValueFromAmount(totalValue));
