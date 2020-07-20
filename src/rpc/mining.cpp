@@ -25,7 +25,6 @@
 #include <numeric>
 
 #include <amount.h>
-#include <bitcoinapi/bitcoinapi.h>
 #include <chain.h>
 #include <chainparams.h>
 #include <consensus/consensus.h>
@@ -548,9 +547,9 @@ static void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& 
     }
 }
 
+// Same functionality as bitcoin-cli getrawtransaction <txhash>
 static UniValue getrawtransaction(uint256 hash)
 {
-
     bool in_active_chain = true;
     CBlockIndex* blockindex = nullptr;
 
@@ -597,6 +596,7 @@ static UniValue getrawtransaction(uint256 hash)
     return result;
 }
 
+// Same functionality as bitcoin-cli decoderawtransaction <hexstring>
 static UniValue decoderawtransaction(std::string request)
 {
     CMutableTransaction mtx;
@@ -865,41 +865,29 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     const bool fPreSegWit = (pindexPrev->nHeight + 1 < consensusParams.SegwitHeight);
 
     UniValue aCaps(UniValue::VARR); aCaps.push_back("proposal");
-
-    UniValue transactions(UniValue::VARR);
-    UniValue addresses(UniValue::VARR);
+   
     std::map<uint256, int64_t> setTxIndex;
     int i = 0;
 
-    //dmg
-    Value transactionHash, transactionData;
-    UniValue decodedTransactions(UniValue::VARR);
-
-    std::string username = "dmg";
-    std::string password = "tempass1";
-    std::string address = "127.0.0.1";
-    int port = 8332;
-
-    // Connect to Bitcoin Daemon locally
-    BitcoinAPI btc(username, password, address, port);
-    Json::FastWriter fastWriter;
+    // Connecting to dmg's mysql db
     sql::Driver *driver;
     sql::Connection *con;
     sql::Statement *stmt;
     sql::ResultSet *res;
     driver = get_driver_instance();
-    con = driver->connect("ws-bitcoin.clueaywb0zyp.us-west-2.rds.amazonaws.com", "root", "letmein2");
+    con = driver->connect("host", "user", "password");
     /* Connect to the MySQL btc database */
-    con->setSchema("btc");
+    con->setSchema("db");
     stmt = con->createStatement();
 	std::string query;
+    UniValue decodedTransactions(UniValue::VARR);
+
+    UniValue transactions(UniValue::VARR);
+
     for (const auto& it : pblock->vtx) {
         const CTransaction& tx = *it;
         uint256 txHash = tx.GetHash();
         setTxIndex[txHash] = i++;
-
-        // std::string address = fastWriter.write(tx);
-        // return address;
 
         if (tx.IsCoinBase())
             continue;
@@ -910,93 +898,10 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         entry.pushKV("txid", txHash.GetHex());
         entry.pushKV("hash", tx.GetWitnessHash().GetHex());
 
-        //dmg
+        // For each transaction in the mempool we decode it and add it to the decodedTransactions array - This will be used to get a list of the addresses in the mempool
         UniValue decodedTransaction(UniValue::VOBJ);
         TxToUniv(tx, uint256(), decodedTransaction, false);
         decodedTransactions.push_back(decodedTransaction);
-        // for (int i = 0; i < decodedTransaction["vin"].size(); i++) {
-        //     uint256 input = ParseHashV(decodedTransaction["vin"][i]["txid"], "parameter 1");
-        //     UniValue rawTransaction = getrawtransaction(input);
-        //     UniValue decodedInput = decoderawtransaction(rawTransaction.get_str());
-        //     int output_int = decodedTransaction["vin"][i]["vout"].asInt();
-        //     UniValue inputAddresses = decodedInput["vout"][output_int]["scriptPubKey"]["addresses"][0];
-        // }
-        
-
-
-        // dmg.append(txHash.GetHex());
-        // transactionHash = txHash.GetHex();
-        
-        // Value result, addresses, transaction_to_addresses, get_raw_tx_params, decode_tx_params, decoded;
-
-        // get_raw_tx_params.append(transactionHash);
-        // // return decoderawtransaction(getrawtransaction(tx.GetHash()));
-
-        // decode_tx_params.append(btc.sendcommand("getrawtransaction", get_raw_tx_params));
-        // decoded = btc.sendcommand("decoderawtransaction", decode_tx_params);
-        
-        // INPUTS
-        // for (int j = 0; j < decoded["vin"].size(); j++) {
-            // Input addresses are not included in decoded raw transaction
-
-
-
-            // Value input_tx_params, input_raw_tx, decoded_input_tx;
-            // // need to code the previous transaction and check the outputs against this input
-            // input_tx_params.append(decoded["vin"][j]["txid"]);
-            // input_raw_tx.append(btc.sendcommand("getrawtransaction", input_tx_params));
-            // decoded_input_tx = btc.sendcommand("decoderawtransaction", input_raw_tx);
-            // Value output_int = decoded["vin"][j]["vout"];
-            // // This is the input address as a JSON object
-            // Value address_obj = decoded_input_tx["vout"][output_int.asInt()]["scriptPubKey"]["addresses"][0];
-            // std::string address = fastWriter.write(address_obj);
-            // address.erase(std::remove(address.begin(), address.end(), '\n'), address.end());
-
-
-
-
-    //         query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address = " + address_str + ";";
-    //         res = stmt->executeQuery(query);
-    //         std::string mysql_address = "";
-    //         int mysql_category;
-    //         // Value labelledAddresses, transactions_with_labels;
-    // //      int count = 0
-    //         while (res->next()) {
-    //                 mysql_address = res->getString("address");
-    //                 mysql_category = res->getInt("category_id");
-    //         // labelledAddresses.append(mysql_address);
-    // //              count ++
-    //         }
-            
-    //         UniValue results(UniValue::VOBJ);
-    //         results = mysql_category;
-    //         // if (mysql_category == 37) {
-    //         //     return results;
-    //         // }
-    //         return results;
-
-
-
-
-            // addresses.append(address);
-            // std::string current_address = fastWriter.write(address);
-            // current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
-
-            // transaction_to_addresses[current_address] = decoded["txid"];
-        // }
-       
-    //     // NEEDED
-    //     // OUTPUTS
-        // for (int j = 0; j < decoded["vout"].size(); j++) {
-        //     for (int k = 0; k < decoded["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
-        //             Value address = decoded["vout"][j]["scriptPubKey"]["addresses"][k];
-        //             addresses.append(address);
-        //             std::string current_address = fastWriter.write(address);
-        //             current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
-        //             transaction_to_addresses[current_address] = decoded["txid"];
-        //     }
-        // }    
-
 
         UniValue deps(UniValue::VARR);
         for (const CTxIn &in : tx.vin)
@@ -1019,40 +924,30 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         transactions.push_back(entry);
     }
 
+    // Variables used to sort through mempool against dmg's db 
+    UniValue addresses(UniValue::VARR);
     UniValue inputs(UniValue::VARR);
     UniValue outputs(UniValue::VARR);
     UniValue outputsStaging(UniValue::VOBJ);
-
     UniValue transactionToAddress(UniValue::VOBJ);
-    // get inputs
+    // We grab all the inputs and outputs for each transaction. All outputs include the addresses in the decoded code. Inputs are handled below
     for (int i = 0; i < decodedTransactions.size(); i++) {
         // Inputs
         for (int j = 0; j < decodedTransactions[i]["vin"].size(); j++) {
             inputs.push_back(decodedTransactions[i]["vin"][j]);
-
-            // uint256 input = ParseHashV(decodedTransactions[i]["vin"][j]["txid"], "parameter 1");
-            // UniValue rawTransaction = getrawtransaction(input);
-            // UniValue decodedInput = decoderawtransaction(rawTransaction.get_str());
-            // int output_int = decodedTransactions[i]["vin"][j]["vout"].get_int();
-            // UniValue inputAddress = decodedInput["vout"][output_int]["scriptPubKey"]["addresses"][0];
-            // addresses.push_back(inputAddress);
         }
         
-        // // Outputs
+        // Outputs
         for (int j = 0; j < decodedTransactions[i]["vout"].size(); j++) {
             std::string txid = decodedTransactions[i]["txid"].get_str();
             outputsStaging = decodedTransactions[i]["vout"][j];
             outputsStaging.pushKV("txid", txid);
-            // outputs.push_back(decodedTransactions[i]["vout"][j]);
             outputs.push_back(outputsStaging);
-        //     for (int k = 0; k < decodedTransactions[i]["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
-        //             UniValue outputAddress = decodedTransactions[i]["vout"][j]["scriptPubKey"]["addresses"][k];
-        //             addresses.push_back(outputAddress);
-
-        //             // transaction_to_addresses[current_address] = decoded["txid"];
-        //     }
         }  
     }
+
+    // For each input we need to check the previous transaction to find the address.
+    // This section is causing biggest time constraint
     for (int j = 0; j < inputs.size(); j++) {
         uint256 input = ParseHashV(inputs[j]["txid"], "parameter 1");
         UniValue rawTransaction = getrawtransaction(input);
@@ -1071,6 +966,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         }
     }
 
+    // Convert the address list into a string to be used in the sql query
     std::string addressList = "(";
     for (int i = 0; i < addresses.size(); i++) {
         //addressList += addresses[j];
@@ -1081,28 +977,30 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         }
     }
     addressList += ")";
+
+    // sql query
 	query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + " AND category_id IS NOT NULL;";
     res = stmt->executeQuery(query);
     std::string mysql_address;
     
-	Value transactions_with_labels;
-
     UniValue labelledAddresses(UniValue::VARR);
     UniValue labelledTransactions(UniValue::VARR);
 
+    // Check every labelled address
     while (res->next()) {
         mysql_address = res->getString("address");
         int mysql_category = res->getInt("category_id");
+        // this could be included in sql query
         if (mysql_category == 3 || mysql_category == 5 || mysql_category == 9 || mysql_category == 14 || mysql_category == 20 || mysql_category == 25 || mysql_category ==  30 || mysql_category == 32 || mysql_category == 34 || mysql_category == 35 || mysql_category == 37) {
             labelledAddresses.push_back(mysql_address);
             labelledTransactions.push_back(transactionToAddress[mysql_address]);
         }
     }
-    // UniValue test(UniValue::VOBJ);
+
     UniValue verifiedTransactions(UniValue::VARR);
     int removedTransactions = 0;
-    // test.pushKV("beforeCheck", transactions.size());
 
+    // Check every tx against the transactions that have labels
     for (int i = 0; i < transactions.size(); i++) {
         bool exclude = false;
 
@@ -1190,6 +1088,8 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
 
     result.pushKV("previousblockhash", pblock->hashPrevBlock.GetHex());
     // result.pushKV("transactions", transactions);
+
+    // add the verified Transactions to the block template
     result.pushKV("transactions", verifiedTransactions);
     result.pushKV("coinbaseaux", aux);
     result.pushKV("coinbasevalue", (int64_t)pblock->vtx[0]->vout[0].nValue);
@@ -1218,6 +1118,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     if (!pblocktemplate->vchCoinbaseCommitment.empty()) {
         result.pushKV("default_witness_commitment", HexStr(pblocktemplate->vchCoinbaseCommitment.begin(), pblocktemplate->vchCoinbaseCommitment.end()));
     }
+    // for reference add the number of removed transactions
     result.pushKV("removedTransactions", removedTransactions);
 
     return result;
@@ -1521,296 +1422,6 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
     return result;
 }
 
-static UniValue dmgvalidate(const JSONRPCRequest& request)
-{
-     sql::Driver *driver;
-    sql::Connection *con;
-    sql::Statement *stmt;
-    sql::ResultSet *res;
-    driver = get_driver_instance();
-    con = driver->connect("ws-bitcoin.clueaywb0zyp.us-west-2.rds.amazonaws.com", "root", "letmein2");
-    /* Connect to the MySQL btc database */
-    con->setSchema("btc");
-    stmt = con->createStatement();
-	std::string query;
-	
-	std::string username = "dmg";
-    std::string password = "tempass1";
-   	std::string address = "127.0.0.1";
-    int port = 8332;
-    Json::FastWriter fastWriter;
-	
-	// Connect to Bitcoin Daemon locally
-	BitcoinAPI btc(username, password, address, port);
-	std::string command = "getblocktemplate";
-    Value rules, params, result, addresses, transaction_to_addresses;
-    rules["rules"][0] = "segwit";
-    params.append(rules);
-	result = btc.sendcommand(command, params);
-    for (int i = 0; i < result["transactions"].size(); i++) {
-            Value tx_params, decoded;
-            tx_params.append(result["transactions"][i]["data"]);
-            decoded = btc.sendcommand("decoderawtransaction", tx_params);
-            // INPUTS
-            for (int j = 0; j < decoded["vin"].size(); j++) {
-                    Value input_params, input_raw_tx_str, decoded_input;
-                    input_params.append(decoded["vin"][j]["txid"]);
-                    input_raw_tx_str.append(btc.sendcommand("getrawtransaction", input_params));
-                    decoded_input = btc.sendcommand("decoderawtransaction", input_raw_tx_str);
-                    Value output_int = decoded["vin"][j]["vout"];
-                    Value address = decoded_input["vout"][output_int.asInt()]["scriptPubKey"]["addresses"][0];
-                    std::string address_str = fastWriter.write(address);
-                    address_str.erase(std::remove(address_str.begin(), address_str.end(), '\n'), address_str.end());
-                    query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address = " + address_str + ";";
-                    res = stmt->executeQuery(query);
-                    std::string mysql_address = "";
-                    int mysql_category;
-                    // Value labelledAddresses, transactions_with_labels;
-            //      int count = 0
-                    while (res->next()) {
-                            mysql_address = res->getString("address");
-                            mysql_category = res->getInt("category_id");
-                    // labelledAddresses.append(mysql_address);
-            //              count ++
-                    }
-                    
-                    UniValue results(UniValue::VOBJ);
-                    results = mysql_category;
-                    // if (mysql_category == 37) {
-                    //     return results;
-                    // }
-                    return results;
-                    addresses.append(address);
-                    std::string current_address = fastWriter.write(address);
-                    current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
-
-                    transaction_to_addresses[current_address] = decoded["txid"];
-            }
-    }
-        // NEEDED
-        // OUTPUTS
-    //         for (int j = 0; j < decoded["vout"].size(); j++) {
-    //                 for (int k = 0; k < decoded["vout"][j]["scriptPubKey"]["addresses"].size(); k++) {
-    //                         Value address = decoded["vout"][j]["scriptPubKey"]["addresses"][k];
-    //                         addresses.append(address);
-    //                         std::string current_address = fastWriter.write(address);
-    //                         current_address.erase(std::remove(current_address.begin(), current_address.end(), '\n'), current_address.end());
-    //                         transaction_to_addresses[current_address] = decoded["txid"];
-    //                 }
-    //         }
-    // }
-
-	// std::string addressList = "(";
-    //     std::cout << addresses.size() << std::endl;
-    //     for (int j = 0; j < addresses.size(); j++) {
-    //             //addressList += addresses[j];
-    //             std::string address = fastWriter.write(addresses[j]);
-    //             address.erase(std::remove(address.begin(), address.end(), '\n'), address.end());
-    //             addressList += address;
-    //             if (addresses.size() - 1 != j) {
-    //                     addressList += ", ";
-    //             }
-    //     }
-    //     addressList += ")";
-
-
-
-//	RPCHelpMan{"getblocktemplate",
-//                "\nIf the request parameters include a 'mode' key, that is used to explicitly select between the default 'template' request or a 'proposal'.\n"
-//                "It returns data needed to construct a block to work on.\n"
-//                "For full specification, see BIPs 22, 23, 9, and 145:\n"
-//                "    https://github.com/bitcoin/bips/blob/master/bip-0022.mediawiki\n"
-//                "    https://github.com/bitcoin/bips/blob/master/bip-0023.mediawiki\n"
-//                "    https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki#getblocktemplate_changes\n"
-//                "    https://github.com/bitcoin/bips/blob/master/bip-0145.mediawiki\n",
-//                {
-//                    {"template_request", RPCArg::Type::OBJ, "{}", "Format of the template",
-//                        {
-//                            {"mode", RPCArg::Type::STR, /* treat as named arg */ RPCArg::Optional::OMITTED_NAMED_ARG, "This must be set to \"template\", \"proposal\" (see BIP 23), or omitted"},
-//                            {"capabilities", RPCArg::Type::ARR, /* treat as named arg */ RPCArg::Optional::OMITTED_NAMED_ARG, "A list of strings",
-//                                {
-//                                    {"support", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "client side supported feature, 'longpoll', 'coinbasetxn', 'coinbasevalue', 'proposal', 'serverlist', 'workid'"},
-//                                },
-//                                },
-//                            {"rules", RPCArg::Type::ARR, RPCArg::Optional::NO, "A list of strings",
-//                                {
-//                                    {"support", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "client side supported softfork deployment"},
-//                                },
-//                                },
-//                        },
-//                        "\"template_request\""},
-//                },
-//                RPCResult{
-//                    RPCResult::Type::OBJ, "", "",
-//                    {
-//                        {RPCResult::Type::NUM, "version", "The preferred block version"},
-//                        {RPCResult::Type::ARR, "rules", "specific block rules that are to be enforced",
-//                            {
-//                                {RPCResult::Type::STR, "", "rulename"},
-//                            }},
-//                        {RPCResult::Type::OBJ_DYN, "vbavailable", "set of pending, supported versionbit (BIP 9) softfork deployments",
-//                            {
-//                                {RPCResult::Type::NUM, "rulename", "identifies the bit number as indicating acceptance and readiness for the named softfork rule"},
-//                            }},
-//                        {RPCResult::Type::NUM, "vbrequired", "bit mask of versionbits the server requires set in submissions"},
-//                        {RPCResult::Type::STR, "previousblockhash", "The hash of current highest block"},
-//                        {RPCResult::Type::ARR, "", "contents of non-coinbase transactions that should be included in the next block",
-//                            {
-//                                {RPCResult::Type::OBJ, "", "",
-//                                    {
-//                                        {RPCResult::Type::STR_HEX, "data", "transaction data encoded in hexadecimal (byte-for-byte)"},
-//                                        {RPCResult::Type::STR_HEX, "txid", "transaction id encoded in little-endian hexadecimal"},
-//                                        {RPCResult::Type::STR_HEX, "hash", "hash encoded in little-endian hexadecimal (including witness data)"},
-//                                        {RPCResult::Type::ARR, "depends", "array of numbers",
-//                                            {
-//                                                {RPCResult::Type::NUM, "", "transactions before this one (by 1-based index in 'transactions' list) that must be present in the final block if this one is"},
-//                                            }},
-//                                        {RPCResult::Type::NUM, "fee", "difference in value between transaction inputs and outputs (in satoshis); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one"},
-//                                        {RPCResult::Type::NUM, "sigops", "total SigOps cost, as counted for purposes of block limits; if key is not present, sigop cost is unknown and clients MUST NOT assume it is zero"},
-//                                        {RPCResult::Type::NUM, "weight", "total transaction weight, as counted for purposes of block limits"},
-//                                    }},
-//                            }},
-//                        {RPCResult::Type::OBJ, "coinbaseaux", "data that should be included in the coinbase's scriptSig content",
-//                        {
-//                            {RPCResult::Type::ELISION, "", ""},
-//                        }},
-//                        {RPCResult::Type::NUM, "coinbasevalue", "maximum allowable input to coinbase transaction, including the generation award and transaction fees (in satoshis)"},
-//                        {RPCResult::Type::OBJ, "coinbasetxn", "information for coinbase transaction",
-//                        {
-//                            {RPCResult::Type::ELISION, "", ""},
-//                        }},
-//                        {RPCResult::Type::STR, "target", "The hash target"},
-//                        {RPCResult::Type::NUM_TIME, "mintime", "The minimum timestamp appropriate for the next block time, expressed in " + UNIX_EPOCH_TIME},
-//                        {RPCResult::Type::ARR, "mutable", "list of ways the block template may be changed",
-//                            {
-//                                {RPCResult::Type::STR, "value", "A way the block template may be changed, e.g. 'time', 'transactions', 'prevblock'"},
-//                            }},
-//                        {RPCResult::Type::STR_HEX, "noncerange", "A range of valid nonces"},
-//                        {RPCResult::Type::NUM, "sigoplimit", "limit of sigops in blocks"},
-//                        {RPCResult::Type::NUM, "sizelimit", "limit of block size"},
-//                        {RPCResult::Type::NUM, "weightlimit", "limit of block weight"},
-//                        {RPCResult::Type::NUM_TIME, "curtime", "current timestamp in " + UNIX_EPOCH_TIME},
-//                        {RPCResult::Type::STR, "bits", "compressed target of next block"},
-//                        {RPCResult::Type::NUM, "height", "The height of the next block"},
-//                    }},
-//                RPCExamples{
-//                    HelpExampleCli("getblocktemplate", "'{\"rules\": [\"segwit\"]}'")
-//            + HelpExampleRpc("getblocktemplate", "{\"rules\": [\"segwit\"]}")
-//                },
-//            }.Check(request);
-	//return getblocktemplate(request);
-//            RPCHelpMan{"getblocktotalvalue",
-//                "\nReturns an Object with information on the total value of transactions in block <hash>.\n",
-//                {
-//                    {"blockhash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, /*default */ "", "The block hash"},
-//                },
-//                RPCResult{
-//                    RPCResult::Type::OBJ, "", "",
-//                    {
-//                        {RPCResult::Type::STR_HEX, "hash", "(string) the block hash (same as provided)."},
-//                        {RPCResult::Type::STR_HEX, "nTx", "(numeric) The number of transactions in the block."},
-//                        {RPCResult::Type::STR_HEX, "totalValue", "(numeric) The total value of all the transactions in the block."}
-//                    }},
-//                RPCExamples{
-//                    HelpExampleCli("getblocktotalvalue", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\" \"basic\"") +
-//                    HelpExampleRpc("getblocktotalvalue", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\", \"basic\"")
-//                }
-//             }.Check(request);
-    // mysql connection
-    //try {
-
-//NEEEDED
-//         sql::Driver *driver;
-//         sql::Connection *con;
-//         sql::Statement *stmt;
-//         sql::ResultSet *res;
-//         driver = get_driver_instance();
-//         con = driver->connect("ws-bitcoin.clueaywb0zyp.us-west-2.rds.amazonaws.com", "root", "letmein2");
-//         /* Connect to the MySQL btc database */
-//         con->setSchema("btc");
-//         stmt = con->createStatement();
-// 	std::string query;
-// 	query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + ";";
-//         res = stmt->executeQuery(query);
-//         std::string mysql_address = "";
-// 	Value labelledAddresses, transactions_with_labels;
-// //      int count = 0
-//         while (res->next()) {
-//                 mysql_address = res->getString("address");
-// 		labelledAddresses.append(mysql_address);
-// //              count ++
-//         }
-// 	//std::string str_labelledAddresses = fastWriter.write(labelledAddresses);
-// 	for (int k = 0; k < labelledAddresses.size(); k++) {
-// 		std::string labelledAddress = fastWriter.write(labelledAddresses[k]);
-// 		labelledAddress.erase(std::remove(labelledAddress.begin(), labelledAddress.end(), '\n'), labelledAddress.end());
-// 		Value transaction = transaction_to_addresses[labelledAddress];
-// 		transactions_with_labels.append(transaction);
-// // TODO CHECK CATEGORY_ID
-// 	}
-//         std::string str_labelledAddresses = fastWriter.write(transactions_with_labels);
-
-	
-
-
-// 	return str_labelledAddresses;
-//         //return mysql_address;
-//         delete res;
-//         delete stmt;
-//         delete con;
-
-
-
-
-
-
-
-    //} catch (sql::SQLException &e) {
-
-    //}
-    // The following code was copied from the getblock function as we are performing a similar
-    // operation
-    //LOCK(cs_main);
-
-    //uint256 hash(ParseHashV(request.params[0], "blockhash"));
-
-
-
-    // UniValue results(UniValue::VOBJ);
-
-
-
-    //const CBlockIndex* pblockindex = LookupBlockIndex(hash);
-    //if (!pblockindex) {
-    //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
-    //}
-    //const CBlock block = GetBlockChecked(pblockindex);
-    //AssertLockHeld(cs_main);
-    // Here we declare a variable to hold the total value
-    //double totalValue = 0;
-
-    // Now loop through the block’s transactions and each transactions “out” and add each
-    // amount to the total
-    //for(const auto& tx : block.vtx)
-    //{
-    //    for (unsigned int i = 0; i < tx->vout.size(); i++) {
-    //        totalValue += tx->vout[i].nValue;
-    //    }
-    //}
-
-
-
-        // results = mysql_address;
-
-
-
-    // Add the total number of transactions and the total value to our result.
-    //result.pushKV("numTxs", (uint64_t)block.vtx.size());
-    //result.pushKV("totalValue", ValueFromAmount(totalValue));
-        return "mining";
-}
-
-
 void RegisterMiningRPCCommands(CRPCTable &t)
 {
 // clang-format off
@@ -1823,8 +1434,6 @@ static const CRPCCommand commands[] =
     { "mining",             "getblocktemplate",       &getblocktemplate,       {"template_request"} },
     { "mining",             "submitblock",            &submitblock,            {"hexdata","dummy"} },
     { "mining",             "submitheader",           &submitheader,           {"hexdata"} },
-    { "blockchain",         "dmgvalidate",            &dmgvalidate,            {"blockhash"} },
-
 
     { "generating",         "generatetoaddress",      &generatetoaddress,      {"nblocks","address","maxtries"} },
     { "generating",         "generatetodescriptor",   &generatetodescriptor,   {"num_blocks","descriptor","maxtries"} },
