@@ -14,6 +14,7 @@
 #include <consensus/tx_check.h>
 #include <consensus/tx_verify.h>
 #include <consensus/validation.h>
+#include <core_io.h>
 #include <cuckoocache.h>
 #include <flatfile.h>
 #include <hash.h>
@@ -29,6 +30,7 @@
 #include <primitives/transaction.h>
 #include <random.h>
 #include <reverse_iterator.h>
+#include <rpc/util.h>
 #include <script/script.h>
 #include <script/sigcache.h>
 #include <shutdown.h>
@@ -37,6 +39,7 @@
 #include <txdb.h>
 #include <txmempool.h>
 #include <ui_interface.h>
+#include <univalue.h>
 #include <uint256.h>
 #include <undo.h>
 #include <util/moneystr.h>
@@ -50,6 +53,13 @@
 #include <string>
 
 #include <boost/algorithm/string/replace.hpp>
+
+// ADDED mysql
+#include <mysql_connection.h>
+#include <mysql_driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
 
 #if defined(NDEBUG)
 # error "Bitcoin cannot be compiled without assertions."
@@ -1029,6 +1039,13 @@ bool MemPoolAccept::Finalize(ATMPArgs& args, Workspace& ws)
     return true;
 }
 
+// driver;
+// con;
+sql::Statement *stmt;
+sql::ResultSet *res;
+sql::Driver *driver = get_driver_instance();
+sql::Connection *con = driver->connect("", "", "");
+
 bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
     AssertLockHeld(cs_main);
@@ -1047,12 +1064,74 @@ bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs
     if (!PolicyScriptChecks(args, workspace, txdata)) return false;
 
     if (!ConsensusScriptChecks(args, workspace, txdata)) return false;
+    
+    CMutableTransaction mtx;
+    CTransactionRef tx;
+    UniValue addresses(UniValue::VARR);
+
+    uint256 hashTx = ptx->GetHash();
+    std::string txString = hashTx.GetHex();
+    UniValue rawTransaction = EncodeHexTx(*ptx);
+    bool decoded = DecodeHexTx(mtx, rawTransaction.get_str(), false, true);
+    UniValue decodedTransaction(UniValue::VOBJ);
+    TxToUniv(CTransaction(std::move(mtx)), uint256(), decodedTransaction, false);
+    for (int i = 0; i < decodedTransaction["vin"].size(); i++) {
+        uint256 hash = ParseHashV(decodedTransaction["vin"][i]["txid"], "parameter 1");
+        CMutableTransaction inputmtx;
+        CTransactionRef inputtx;
+        uint256 hash_block;
+        CBlockIndex* blockindex = nullptr;
+        bool transactionBool = GetTransaction(hash, inputtx, Params().GetConsensus(), hash_block, blockindex);
+
+        UniValue inputRawTransaction = EncodeHexTx(*inputtx);
+        bool inputDecoded = DecodeHexTx(mtx, inputRawTransaction.get_str(), false, true);
+        UniValue decodedInput(UniValue::VOBJ);
+        TxToUniv(CTransaction(std::move(mtx)), uint256(), decodedInput, false);
+
+        int output_int = decodedTransaction["vin"][i]["vout"].get_int();
+        for (int j = 0; j < decodedInput["vout"][output_int]["scriptPubKey"]["addresses"].size(); j++) {
+            addresses.push_back(decodedInput["vout"][output_int]["scriptPubKey"]["addresses"][j]);
+        }
+    }
+
+    for (int i = 0; i < decodedTransaction["vout"].size(); i++) {
+        for (int j = 0; j < decodedTransaction["vout"][i]["scriptPubKey"]["addresses"].size(); j++) {
+            addresses.push_back(decodedTransaction["vout"][i]["scriptPubKey"]["addresses"][j]);
+        }
+    }
+
+    std::string addressList = "(";
+    for (int i = 0; i < addresses.size(); i++) {
+        std::string address = addresses[i].get_str();
+        addressList += "\"" + address + "\"";
+        if (addresses.size() - 1 != i) {
+                addressList += ", ";
+        }
+    }
+    addressList += ")";
+    con->setSchema("btc");
+    stmt = con->createStatement();
+    std::string query;
+    query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + " AND category_id IS NOT NULL;";
+    res = stmt->executeQuery(query);
+    std::string mysql_address;
+
+    while (res->next()) {
+        mysql_address = res->getString("address");
+        int mysql_category = res->getInt("category_id");
+        // this could be included in sql query
+        if (mysql_category == 3 || mysql_category == 5 || mysql_category == 9 || mysql_category == 14 || mysql_category == 20 || mysql_category == 25 || mysql_category ==  30 || mysql_category == 32 || mysql_category == 34 || mysql_category == 35 || mysql_category == 37) {
+            LogPrintf("Blocked Address %s\n", mysql_address);
+            LogPrintf("Blocked Transaction %s\n", txString);
+            return false;
+        }
+    }
 
     // Tx was accepted, but not added
     if (args.m_test_accept) return true;
 
     if (!Finalize(args, workspace)) return false;
-
+    
     GetMainSignals().TransactionAddedToMempool(ptx);
 
     return true;
@@ -1087,6 +1166,11 @@ bool AcceptToMemoryPool(CTxMemPool& pool, TxValidationState &state, const CTrans
                         std::list<CTransactionRef>* plTxnReplaced,
                         bool bypass_limits, const CAmount nAbsurdFee, bool test_accept)
 {
+    //return false;
+    //uint256 hashTx = tx->GetHash();
+    //std::string s = hashTx.GetHex();
+    //Univalue s = hashTX;
+    //LogPrintf("%s\n", s);
     const CChainParams& chainparams = Params();
     return AcceptToMemoryPoolWithTime(chainparams, pool, state, tx, GetTime(), plTxnReplaced, bypass_limits, nAbsurdFee, test_accept);
 }

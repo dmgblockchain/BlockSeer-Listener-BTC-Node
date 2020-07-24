@@ -21,7 +21,6 @@
 #include <policy/policy.h>
 #include <policy/rbf.h>
 #include <primitives/transaction.h>
-#include <rpc/mining.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
 #include <script/descriptor.h>
@@ -45,13 +44,6 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-// ADDED mysql
-#include <mysql_connection.h>
-#include <mysql_driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
-using namespace sql;
 
 struct CUpdatedBlock
 {

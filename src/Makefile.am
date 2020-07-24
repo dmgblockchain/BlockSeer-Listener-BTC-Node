@@ -587,7 +587,7 @@ bitcoin_bin_ldadd += $(BOOST_LIBS) $(BDB_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREAD
 bitcoind_SOURCES = $(bitcoin_daemon_sources)
 bitcoind_CPPFLAGS = $(bitcoin_bin_cppflags)
 bitcoind_CXXFLAGS = $(bitcoin_bin_cxxflags) $(MYSQL_CFLAGS)
-bitcoind_LDFLAGS = $(bitcoin_bin_ldflags) $(MYSQL_LDFLAGS) -L/usr/lib/mysqlcppconn -L/usr/lib -lmysqlcppconn -lmysqlcppconn-static -lcurl -ljsonrpccpp-common -ljsonrpccpp-client -lbitcoinapi -ljsoncpp 
+bitcoind_LDFLAGS = $(bitcoin_bin_ldflags) $(MYSQL_LDFLAGS) -L/usr/lib/mysqlcppconn -L/usr/lib -lmysqlcppconn -lmysqlcppconn-static  
 bitcoind_LDADD = $(LIBBITCOIN_SERVER) $(bitcoin_bin_ldadd)
 
 bitcoin_node_SOURCES = $(bitcoin_daemon_sources)

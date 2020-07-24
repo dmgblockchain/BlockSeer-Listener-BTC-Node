@@ -3,27 +3,6 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-
-#include <coins.h>
-#include <index/txindex.h>
-#include <node/coin.h>
-#include <node/psbt.h>
-#include <node/transaction.h>
-#include <policy/policy.h>
-#include <policy/rbf.h>
-#include <primitives/transaction.h>
-#include <psbt.h>
-#include <random.h>
-#include <rpc/rawtransaction_util.h>
-#include <rpc/server.h>
-#include <rpc/util.h>
-#include <script/sign.h>
-#include <script/standard.h>
-#include <uint256.h>
-#include <util/moneystr.h>
-
-#include <numeric>
-
 #include <amount.h>
 #include <chain.h>
 #include <chainparams.h>
@@ -31,13 +10,9 @@
 #include <consensus/params.h>
 #include <consensus/validation.h>
 #include <core_io.h>
-#include <jsoncpp/json/json.h>
-#include <jsonrpccpp/client.h>
-#include <jsonrpccpp/client/connectors/httpclient.h>
 #include <key_io.h>
 #include <miner.h>
 #include <net.h>
-#include <nlohmann/json.hpp>
 #include <node/context.h>
 #include <policy/fees.h>
 #include <pow.h>
@@ -64,16 +39,6 @@
 
 #include <memory>
 #include <stdint.h>
-
-// ADDED mysql
-#include <mysql_connection.h>
-#include <mysql_driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
-using json = nlohmann::json;
-using namespace jsonrpc;
-using namespace sql;
 
 /**
  * Return average network hashes per second based on the last 'lookup' blocks,
@@ -520,97 +485,6 @@ static std::string gbt_vb_name(const Consensus::DeploymentPos pos) {
     return s;
 }
 
-
-static void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
-{
-    // Call into TxToUniv() in bitcoin-common to decode the transaction hex.
-    //
-    // Blockchain contextual information (confirmations and blocktime) is not
-    // available to code in bitcoin-common, so we query them here and push the
-    // data into the returned UniValue.
-    TxToUniv(tx, uint256(), entry, true, RPCSerializationFlags());
-
-    if (!hashBlock.IsNull()) {
-        LOCK(cs_main);
-
-        entry.pushKV("blockhash", hashBlock.GetHex());
-        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
-        if (pindex) {
-            if (::ChainActive().Contains(pindex)) {
-                entry.pushKV("confirmations", 1 + ::ChainActive().Height() - pindex->nHeight);
-                entry.pushKV("time", pindex->GetBlockTime());
-                entry.pushKV("blocktime", pindex->GetBlockTime());
-            }
-            else
-                entry.pushKV("confirmations", 0);
-        }
-    }
-}
-
-// Same functionality as bitcoin-cli getrawtransaction <txhash>
-static UniValue getrawtransaction(uint256 hash)
-{
-    bool in_active_chain = true;
-    CBlockIndex* blockindex = nullptr;
-
-    if (hash == Params().GenesisBlock().hashMerkleRoot) {
-        // Special exception for the genesis block coinbase transaction
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "The genesis block coinbase is not considered an ordinary transaction and cannot be retrieved");
-    }
-
-    // Accept either a bool (true) or a num (>=1) to indicate verbose output.
-    bool fVerbose = false;
-
-
-    bool f_txindex_ready = false;
-    if (g_txindex && !blockindex) {
-        f_txindex_ready = g_txindex->BlockUntilSyncedToCurrentChain();
-    }
-
-    CTransactionRef tx;
-    uint256 hash_block;
-    if (!GetTransaction(hash, tx, Params().GetConsensus(), hash_block, blockindex)) {
-        std::string errmsg;
-        if (blockindex) {
-            if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
-                throw JSONRPCError(RPC_MISC_ERROR, "Block not available");
-            }
-            errmsg = "No such transaction found in the provided block";
-        } else if (!g_txindex) {
-            errmsg = "No such mempool transaction. Use -txindex or provide a block hash to enable blockchain transaction queries";
-        } else if (!f_txindex_ready) {
-            errmsg = "No such mempool transaction. Blockchain transactions are still in the process of being indexed";
-        } else {
-            errmsg = "No such mempool or blockchain transaction";
-        }
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, errmsg + ". Use gettransaction for wallet transactions.");
-    }
-
-    if (!fVerbose) {
-        return EncodeHexTx(*tx, RPCSerializationFlags());
-    }
-
-    UniValue result(UniValue::VSTR);
-    // if (blockindex) result.pushKV("in_active_chain", in_active_chain);
-    TxToJSON(*tx, hash_block, result);
-    return result;
-}
-
-// Same functionality as bitcoin-cli decoderawtransaction <hexstring>
-static UniValue decoderawtransaction(std::string request)
-{
-    CMutableTransaction mtx;
-
-    if (!DecodeHexTx(mtx, request, false, true)) {
-        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
-    }
-
-    UniValue result(UniValue::VOBJ);
-    TxToUniv(CTransaction(std::move(mtx)), uint256(), result, false);
-
-    return result;
-}
-
 static UniValue getblocktemplate(const JSONRPCRequest& request)
 {
             RPCHelpMan{"getblocktemplate",
@@ -865,25 +739,11 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     const bool fPreSegWit = (pindexPrev->nHeight + 1 < consensusParams.SegwitHeight);
 
     UniValue aCaps(UniValue::VARR); aCaps.push_back("proposal");
-   
-    std::map<uint256, int64_t> setTxIndex;
-    int i = 0;
-
-    // Connecting to dmg's mysql db
-    sql::Driver *driver;
-    sql::Connection *con;
-    sql::Statement *stmt;
-    sql::ResultSet *res;
-    driver = get_driver_instance();
-    con = driver->connect("host", "user", "password");
-    /* Connect to the MySQL btc database */
-    con->setSchema("db");
-    stmt = con->createStatement();
-	std::string query;
-    UniValue decodedTransactions(UniValue::VARR);
 
     UniValue transactions(UniValue::VARR);
-
+    std::map<uint256, int64_t> setTxIndex;
+    int i = 0;
+    
     for (const auto& it : pblock->vtx) {
         const CTransaction& tx = *it;
         uint256 txHash = tx.GetHash();
@@ -897,11 +757,6 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         entry.pushKV("data", EncodeHexTx(tx));
         entry.pushKV("txid", txHash.GetHex());
         entry.pushKV("hash", tx.GetWitnessHash().GetHex());
-
-        // For each transaction in the mempool we decode it and add it to the decodedTransactions array - This will be used to get a list of the addresses in the mempool
-        UniValue decodedTransaction(UniValue::VOBJ);
-        TxToUniv(tx, uint256(), decodedTransaction, false);
-        decodedTransactions.push_back(decodedTransaction);
 
         UniValue deps(UniValue::VARR);
         for (const CTxIn &in : tx.vin)
@@ -924,99 +779,6 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         transactions.push_back(entry);
     }
 
-    // Variables used to sort through mempool against dmg's db 
-    UniValue addresses(UniValue::VARR);
-    UniValue inputs(UniValue::VARR);
-    UniValue outputs(UniValue::VARR);
-    UniValue outputsStaging(UniValue::VOBJ);
-    UniValue transactionToAddress(UniValue::VOBJ);
-    // We grab all the inputs and outputs for each transaction. All outputs include the addresses in the decoded code. Inputs are handled below
-    for (int i = 0; i < decodedTransactions.size(); i++) {
-        // Inputs
-        for (int j = 0; j < decodedTransactions[i]["vin"].size(); j++) {
-            inputs.push_back(decodedTransactions[i]["vin"][j]);
-        }
-        
-        // Outputs
-        for (int j = 0; j < decodedTransactions[i]["vout"].size(); j++) {
-            std::string txid = decodedTransactions[i]["txid"].get_str();
-            outputsStaging = decodedTransactions[i]["vout"][j];
-            outputsStaging.pushKV("txid", txid);
-            outputs.push_back(outputsStaging);
-        }  
-    }
-
-    // For each input we need to check the previous transaction to find the address.
-    // This section is causing biggest time constraint
-    for (int j = 0; j < inputs.size(); j++) {
-        uint256 input = ParseHashV(inputs[j]["txid"], "parameter 1");
-        UniValue rawTransaction = getrawtransaction(input);
-        UniValue decodedInput = decoderawtransaction(rawTransaction.get_str());
-        int output_int = inputs[j]["vout"].get_int();
-        UniValue inputAddress = decodedInput["vout"][output_int]["scriptPubKey"]["addresses"][0];
-        addresses.push_back(inputAddress);
-        transactionToAddress.pushKV(inputAddress.get_str(), inputs[j]["txid"]);
-    }
-
-    for (int j = 0; j < outputs.size(); j++) {
-        for (int k = 0; k < outputs[j]["scriptPubKey"]["addresses"].size(); k++) {
-            UniValue outputAddress = outputs[j]["scriptPubKey"]["addresses"][k];
-            addresses.push_back(outputAddress);
-            transactionToAddress.pushKV(outputAddress.get_str(), outputs[j]["txid"]);
-        }
-    }
-
-    // Convert the address list into a string to be used in the sql query
-    std::string addressList = "(";
-    for (int i = 0; i < addresses.size(); i++) {
-        //addressList += addresses[j];
-        std::string address = addresses[i].get_str();
-        addressList += "\"" + address + "\"";
-        if (addresses.size() - 1 != i) {
-                addressList += ", ";
-        }
-    }
-    addressList += ")";
-
-    // sql query
-	query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + " AND category_id IS NOT NULL;";
-    res = stmt->executeQuery(query);
-    std::string mysql_address;
-    
-    UniValue labelledAddresses(UniValue::VARR);
-    UniValue labelledTransactions(UniValue::VARR);
-
-    // Check every labelled address
-    while (res->next()) {
-        mysql_address = res->getString("address");
-        int mysql_category = res->getInt("category_id");
-        // this could be included in sql query
-        if (mysql_category == 3 || mysql_category == 5 || mysql_category == 9 || mysql_category == 14 || mysql_category == 20 || mysql_category == 25 || mysql_category ==  30 || mysql_category == 32 || mysql_category == 34 || mysql_category == 35 || mysql_category == 37) {
-            labelledAddresses.push_back(mysql_address);
-            labelledTransactions.push_back(transactionToAddress[mysql_address]);
-        }
-    }
-
-    UniValue verifiedTransactions(UniValue::VARR);
-    int removedTransactions = 0;
-
-    // Check every tx against the transactions that have labels
-    for (int i = 0; i < transactions.size(); i++) {
-        bool exclude = false;
-
-        for (int j = 0; j <labelledTransactions.size(); j++) {
-            if (transactions[i]["txid"].get_str() == labelledTransactions[j].get_str()) {
-                exclude = true;
-                removedTransactions++;
-            }    
-        }
-        if (!exclude) {
-            verifiedTransactions.push_back(transactions[i]);
-        }
-
-    }
-    // test.pushKV("afterCheck", verifiedTransactions.size());
-    // return test;
     UniValue aux(UniValue::VOBJ);
 
     arith_uint256 hashTarget = arith_uint256().SetCompact(pblock->nBits);
@@ -1087,10 +849,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     }
 
     result.pushKV("previousblockhash", pblock->hashPrevBlock.GetHex());
-    // result.pushKV("transactions", transactions);
-
-    // add the verified Transactions to the block template
-    result.pushKV("transactions", verifiedTransactions);
+    result.pushKV("transactions", transactions);
     result.pushKV("coinbaseaux", aux);
     result.pushKV("coinbasevalue", (int64_t)pblock->vtx[0]->vout[0].nValue);
     result.pushKV("longpollid", ::ChainActive().Tip()->GetBlockHash().GetHex() + ToString(nTransactionsUpdatedLast));
@@ -1118,8 +877,6 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     if (!pblocktemplate->vchCoinbaseCommitment.empty()) {
         result.pushKV("default_witness_commitment", HexStr(pblocktemplate->vchCoinbaseCommitment.begin(), pblocktemplate->vchCoinbaseCommitment.end()));
     }
-    // for reference add the number of removed transactions
-    result.pushKV("removedTransactions", removedTransactions);
 
     return result;
 }
@@ -1421,6 +1178,9 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
     }
     return result;
 }
+
+
+
 
 void RegisterMiningRPCCommands(CRPCTable &t)
 {
