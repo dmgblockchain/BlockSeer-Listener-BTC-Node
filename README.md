@@ -2,11 +2,15 @@
 
 ## Installing
 
+The Blockseer Custom Node is a fork of the bitcoin source code. The forked repo can be found at https://github.com/dmgblockchain/bitcoin.
+
+After cloning the repository, make sure to check the file `bitcoin.conf` in the root directory. You can find the rpc user and password for connecting to the node and making rpc queries. Temporary username and password are included there but should not used in production. 
+
+In `src/validation.cpp` on line 1047 you must add the mysql credentials for the blockseer label database. The node will not build without it. You can find the credentials on AWS Secret Manager.
+
 ### Local installation - Ignore this step if using Docker
 
 The size of the bitcoin blockchain is constantly growing and at the time of writing it is about 300GB+, so ensure you have enough disk space before continuing. 
-
-The Blockseer Custom Node is a fork of the bitcoin source code. The forked repo can be found at https://github.com/dmgblockchain/bitcoin.
 
 After cloning the repository, run `apt-get install build-essential autoconf libtool pkg-config libboost-all-dev libssl-dev libprotobuf-dev protobuf-compiler libevent-dev libqt4-dev libcanberra-gtk-module libdb-dev libdb++-dev bsdmainutils libmysqlcppconn-dev -y` to install the dependencies. 
 
