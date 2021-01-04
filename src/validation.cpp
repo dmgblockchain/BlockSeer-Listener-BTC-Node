@@ -1112,7 +1112,7 @@ bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs
     con->setSchema("btc");
     stmt = con->createStatement();
     std::string query;
-    query = "SELECT address, label, category_id FROM bitcoin_addresslabel WHERE address in " + addressList + " AND category_id IS NOT NULL;";
+    query = "SELECT address, label, category_id FROM bitcoin_addresslabel as label INNER JOIN bitcoin_category ON bitcoin_category.id = label.category_id AND bitcoin_category.risk_score = 1 WHERE address in " + addressList + " AND category_id IS NOT NULL;";
     res = stmt->executeQuery(query);
     std::string mysql_address;
 
@@ -1120,11 +1120,11 @@ bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs
         mysql_address = res->getString("address");
         int mysql_category = res->getInt("category_id");
         // this could be included in sql query
-        if (mysql_category == 3 || mysql_category == 5 || mysql_category == 9 || mysql_category == 14 || mysql_category == 20 || mysql_category == 25 || mysql_category ==  30 || mysql_category == 32 || mysql_category == 34 || mysql_category == 35 || mysql_category == 37) {
-            LogPrintf("Blocked Address %s\n", mysql_address);
-            LogPrintf("Blocked Transaction %s\n", txString);
-            return false;
-        }
+//        if (mysql_category == 3 || mysql_category == 5 || mysql_category == 9 || mysql_category == 14 || mysql_category == 20 || mysql_category == 25 || mysql_category ==  30 || mysql_categiory == 32 || mysql_category == 34 || mysql_category == 35 || mysql_category == 37) {
+        LogPrintf("Blocked Address %s\n", mysql_address);
+        LogPrintf("Blocked Transaction %s\n", txString);
+        return false;
+  //      }
     }
 
     // Tx was accepted, but not added
