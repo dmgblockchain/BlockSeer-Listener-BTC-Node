@@ -29,7 +29,7 @@ typedef std::set<CInputCoin> CoinSet;
 static std::vector<COutput> vCoins;
 static NodeContext testNode;
 static auto testChain = interfaces::MakeChain(testNode);
-static CWallet testWallet(testChain.get(), WalletLocation(), CreateDummyWalletDatabase());
+static CWallet testWallet(testChain.get(), "", CreateDummyWalletDatabase());
 static CAmount balance = 0;
 
 CoinEligibilityFilter filter_standard(1, 6, 0);
@@ -64,7 +64,8 @@ static void add_coin(CWallet& wallet, const CAmount& nValue, int nAge = 6*24, bo
     if (spendable) {
         CTxDestination dest;
         std::string error;
-        assert(wallet.GetNewDestination(OutputType::BECH32, "", dest, error));
+        const bool destination_ok = wallet.GetNewDestination(OutputType::BECH32, "", dest, error);
+        assert(destination_ok);
         tx.vout[nInput].scriptPubKey = GetScriptForDestination(dest);
     }
     if (fIsFromMe) {
@@ -283,7 +284,7 @@ BOOST_AUTO_TEST_CASE(bnb_search_test)
     // Make sure that can use BnB when there are preset inputs
     empty_wallet();
     {
-        std::unique_ptr<CWallet> wallet = MakeUnique<CWallet>(m_chain.get(), WalletLocation(), CreateMockWalletDatabase());
+        std::unique_ptr<CWallet> wallet = MakeUnique<CWallet>(m_node.chain.get(), "", CreateMockWalletDatabase());
         bool firstRun;
         wallet->LoadWallet(firstRun);
         wallet->SetupLegacyScriptPubKeyMan();

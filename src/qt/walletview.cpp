@@ -4,9 +4,6 @@
 
 #include <qt/walletview.h>
 
-#include <node/psbt.h>
-#include <node/transaction.h>
-#include <policy/policy.h>
 #include <qt/addressbookpage.h>
 #include <qt/askpassphrasedialog.h>
 #include <qt/clientmodel.h>
@@ -23,7 +20,8 @@
 #include <qt/walletmodel.h>
 
 #include <interfaces/node.h>
-#include <ui_interface.h>
+#include <node/ui_interface.h>
+#include <psbt.h>
 #include <util/strencodings.h>
 
 #include <QAction>
@@ -260,11 +258,11 @@ void WalletView::updateEncryptionStatus()
     Q_EMIT encryptionStatusChanged();
 }
 
-void WalletView::encryptWallet(bool status)
+void WalletView::encryptWallet()
 {
     if(!walletModel)
         return;
-    AskPassphraseDialog dlg(status ? AskPassphraseDialog::Encrypt : AskPassphraseDialog::Decrypt, this);
+    AskPassphraseDialog dlg(AskPassphraseDialog::Encrypt, this);
     dlg.setModel(walletModel);
     dlg.exec();
 

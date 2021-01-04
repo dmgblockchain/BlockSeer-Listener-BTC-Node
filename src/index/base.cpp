@@ -4,9 +4,9 @@
 
 #include <chainparams.h>
 #include <index/base.h>
+#include <node/ui_interface.h>
 #include <shutdown.h>
 #include <tinyformat.h>
-#include <ui_interface.h>
 #include <util/system.h>
 #include <util/translation.h>
 #include <validation.h>
@@ -318,4 +318,13 @@ void BaseIndex::Stop()
     if (m_thread_sync.joinable()) {
         m_thread_sync.join();
     }
+}
+
+IndexSummary BaseIndex::GetSummary() const
+{
+    IndexSummary summary{};
+    summary.name = GetName();
+    summary.synced = m_synced;
+    summary.best_block_height = m_best_block_index.load()->nHeight;
+    return summary;
 }

@@ -156,7 +156,7 @@ protected:
     uint32_t m_expr_index;
 
 public:
-    PubkeyProvider(uint32_t exp_index) : m_expr_index(exp_index) {}
+    explicit PubkeyProvider(uint32_t exp_index) : m_expr_index(exp_index) {}
 
     virtual ~PubkeyProvider() = default;
 
@@ -190,7 +190,7 @@ class OriginPubkeyProvider final : public PubkeyProvider
 
     std::string OriginString() const
     {
-        return HexStr(std::begin(m_origin.fingerprint), std::end(m_origin.fingerprint)) + FormatHDKeypath(m_origin.path);
+        return HexStr(m_origin.fingerprint) + FormatHDKeypath(m_origin.path);
     }
 
 public:
@@ -235,7 +235,7 @@ public:
     }
     bool IsRange() const override { return false; }
     size_t GetSize() const override { return m_pubkey.size(); }
-    std::string ToString() const override { return HexStr(m_pubkey.begin(), m_pubkey.end()); }
+    std::string ToString() const override { return HexStr(m_pubkey); }
     bool ToPrivateString(const SigningProvider& arg, std::string& ret) const override
     {
         CKey key;
@@ -583,7 +583,7 @@ class RawDescriptor final : public DescriptorImpl
 {
     const CScript m_script;
 protected:
-    std::string ToStringExtra() const override { return HexStr(m_script.begin(), m_script.end()); }
+    std::string ToStringExtra() const override { return HexStr(m_script); }
     std::vector<CScript> MakeScripts(const std::vector<CPubKey>&, const CScript*, FlatSigningProvider&) const override { return Vector(m_script); }
 public:
     RawDescriptor(CScript script) : DescriptorImpl({}, {}, "raw"), m_script(std::move(script)) {}
@@ -731,7 +731,7 @@ enum class ParseScriptContext {
 };
 
 /** Parse a key path, being passed a split list of elements (the first element is ignored). */
-NODISCARD bool ParseKeyPath(const std::vector<Span<const char>>& split, KeyPath& out, std::string& error)
+[[nodiscard]] bool ParseKeyPath(const std::vector<Span<const char>>& split, KeyPath& out, std::string& error)
 {
     for (size_t i = 1; i < split.size(); ++i) {
         Span<const char> elem = split[i];
@@ -825,8 +825,9 @@ std::unique_ptr<PubkeyProvider> ParsePubkey(uint32_t key_exp_index, const Span<c
         return nullptr;
     }
     if (origin_split.size() == 1) return ParsePubkeyInner(key_exp_index, origin_split[0], permit_uncompressed, out, error);
-    if (origin_split[0].size() < 1 || origin_split[0][0] != '[') {
-        error = strprintf("Key origin start '[ character expected but not found, got '%c' instead", origin_split[0][0]);
+    if (origin_split[0].empty() || origin_split[0][0] != '[') {
+        error = strprintf("Key origin start '[ character expected but not found, got '%c' instead",
+                          origin_split[0].empty() ? /** empty, implies split char */ ']' : origin_split[0][0]);
         return nullptr;
     }
     auto slash_split = Split(origin_split[0].subspan(1), '/');
@@ -896,7 +897,7 @@ std::unique_ptr<DescriptorImpl> ParseScript(uint32_t key_exp_index, Span<const c
             providers.emplace_back(std::move(pk));
             key_exp_index++;
         }
-        if (providers.size() < 1 || providers.size() > 16) {
+        if (providers.empty() || providers.size() > 16) {
             error = strprintf("Cannot have %u keys in multisig; must have between 1 and 16 keys, inclusive", providers.size());
             return nullptr;
         } else if (thres < 1) {
@@ -985,15 +986,15 @@ std::unique_ptr<PubkeyProvider> InferPubkey(const CPubKey& pubkey, ParseScriptCo
 std::unique_ptr<DescriptorImpl> InferScript(const CScript& script, ParseScriptContext ctx, const SigningProvider& provider)
 {
     std::vector<std::vector<unsigned char>> data;
-    txnouttype txntype = Solver(script, data);
+    TxoutType txntype = Solver(script, data);
 
-    if (txntype == TX_PUBKEY) {
+    if (txntype == TxoutType::PUBKEY) {
         CPubKey pubkey(data[0].begin(), data[0].end());
         if (pubkey.IsValid()) {
             return MakeUnique<PKDescriptor>(InferPubkey(pubkey, ctx, provider));
         }
     }
-    if (txntype == TX_PUBKEYHASH) {
+    if (txntype == TxoutType::PUBKEYHASH) {
         uint160 hash(data[0]);
         CKeyID keyid(hash);
         CPubKey pubkey;
@@ -1001,7 +1002,7 @@ std::unique_ptr<DescriptorImpl> InferScript(const CScript& script, ParseScriptCo
             return MakeUnique<PKHDescriptor>(InferPubkey(pubkey, ctx, provider));
         }
     }
-    if (txntype == TX_WITNESS_V0_KEYHASH && ctx != ParseScriptContext::P2WSH) {
+    if (txntype == TxoutType::WITNESS_V0_KEYHASH && ctx != ParseScriptContext::P2WSH) {
         uint160 hash(data[0]);
         CKeyID keyid(hash);
         CPubKey pubkey;
@@ -1009,7 +1010,7 @@ std::unique_ptr<DescriptorImpl> InferScript(const CScript& script, ParseScriptCo
             return MakeUnique<WPKHDescriptor>(InferPubkey(pubkey, ctx, provider));
         }
     }
-    if (txntype == TX_MULTISIG) {
+    if (txntype == TxoutType::MULTISIG) {
         std::vector<std::unique_ptr<PubkeyProvider>> providers;
         for (size_t i = 1; i + 1 < data.size(); ++i) {
             CPubKey pubkey(data[i].begin(), data[i].end());
@@ -1017,7 +1018,7 @@ std::unique_ptr<DescriptorImpl> InferScript(const CScript& script, ParseScriptCo
         }
         return MakeUnique<MultisigDescriptor>((int)data[0][0], std::move(providers));
     }
-    if (txntype == TX_SCRIPTHASH && ctx == ParseScriptContext::TOP) {
+    if (txntype == TxoutType::SCRIPTHASH && ctx == ParseScriptContext::TOP) {
         uint160 hash(data[0]);
         CScriptID scriptid(hash);
         CScript subscript;
@@ -1026,7 +1027,7 @@ std::unique_ptr<DescriptorImpl> InferScript(const CScript& script, ParseScriptCo
             if (sub) return MakeUnique<SHDescriptor>(std::move(sub));
         }
     }
-    if (txntype == TX_WITNESS_V0_SCRIPTHASH && ctx != ParseScriptContext::P2WSH) {
+    if (txntype == TxoutType::WITNESS_V0_SCRIPTHASH && ctx != ParseScriptContext::P2WSH) {
         CScriptID scriptid;
         CRIPEMD160().Write(data[0].data(), data[0].size()).Finalize(scriptid.begin());
         CScript subscript;

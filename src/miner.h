@@ -84,7 +84,7 @@ struct CompareTxIterByAncestorCount {
     {
         if (a->GetCountWithAncestors() != b->GetCountWithAncestors())
             return a->GetCountWithAncestors() < b->GetCountWithAncestors();
-        return CTxMemPool::CompareIteratorByHash()(a, b);
+        return CompareIteratorByHash()(a, b);
     }
 };
 
@@ -128,8 +128,6 @@ class BlockAssembler
 private:
     // The constructed block template
     std::unique_ptr<CBlockTemplate> pblocktemplate;
-    // A convenience pointer that always refers to the CBlock in pblocktemplate
-    CBlock* pblock;
 
     // Configuration parameters for the block size
     bool fIncludeWitness;

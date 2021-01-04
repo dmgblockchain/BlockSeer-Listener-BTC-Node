@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-void test_one_input(const std::vector<uint8_t>& buffer)
+FUZZ_TARGET(net_permissions)
 {
     FuzzedDataProvider fuzzed_data_provider(buffer.data(), buffer.size());
     const std::string s = fuzzed_data_provider.ConsumeRandomLengthString(32);
@@ -24,6 +24,7 @@ void test_one_input(const std::vector<uint8_t>& buffer)
                                                                                              NetPermissionFlags::PF_FORCERELAY,
                                                                                              NetPermissionFlags::PF_NOBAN,
                                                                                              NetPermissionFlags::PF_MEMPOOL,
+                                                                                             NetPermissionFlags::PF_ADDR,
                                                                                              NetPermissionFlags::PF_ISIMPLICIT,
                                                                                              NetPermissionFlags::PF_ALL,
                                                                                          }) :

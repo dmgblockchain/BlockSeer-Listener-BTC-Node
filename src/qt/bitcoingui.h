@@ -43,11 +43,13 @@ enum class SynchronizationState;
 namespace interfaces {
 class Handler;
 class Node;
+struct BlockAndHeaderTipInfo;
 }
 
 QT_BEGIN_NAMESPACE
 class QAction;
 class QComboBox;
+class QDateTime;
 class QMenu;
 class QProgressBar;
 class QProgressDialog;
@@ -75,9 +77,10 @@ public:
     /** Set the client model.
         The client model represents the part of the core that communicates with the P2P network, and is wallet-agnostic.
     */
-    void setClientModel(ClientModel *clientModel);
+    void setClientModel(ClientModel *clientModel = nullptr, interfaces::BlockAndHeaderTipInfo* tip_info = nullptr);
 #ifdef ENABLE_WALLET
     void setWalletController(WalletController* wallet_controller);
+    WalletController* getWalletController();
 #endif
 
 #ifdef ENABLE_WALLET
@@ -314,9 +317,6 @@ public Q_SLOTS:
 
     /** Show progress dialog e.g. for verifychain */
     void showProgress(const QString &title, int nProgress);
-
-    /** When hideTrayIcon setting is changed in OptionsModel hide or show the icon accordingly. */
-    void setTrayIconVisible(bool);
 
     void showModalOverlay();
 };

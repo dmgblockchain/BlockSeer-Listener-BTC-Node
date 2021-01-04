@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2015-2018 The Bitcoin Core developers
+# Copyright (c) 2015-2020 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test invalid p2p messages for nodes with bloom filters disabled.
@@ -12,7 +12,7 @@ Test that, when bloom filters are not enabled, peers are disconnected if:
 """
 
 from test_framework.messages import msg_mempool, msg_filteradd, msg_filterload, msg_filterclear
-from test_framework.mininode import P2PInterface
+from test_framework.p2p import P2PInterface
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import assert_equal
 
