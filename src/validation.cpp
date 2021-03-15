@@ -39,7 +39,7 @@
 #include <tinyformat.h>
 #include <txdb.h>
 #include <txmempool.h>
-#include <ui_interface.h>
+//#include <ui_interface.h>
 #include <univalue.h>
 #include <uint256.h>
 #include <undo.h>
@@ -56,12 +56,18 @@
 
 #include <boost/algorithm/string/replace.hpp>
 
+#include <stdexcept>
+#include <string>
+#include <memory>
+
 // ADDED mysql
+#define throw(...)
 #include <mysql_connection.h>
 #include <mysql_driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#undef throw /* reset */
 
 #if defined(NDEBUG)
 # error "Bitcoin cannot be compiled without assertions."
@@ -1043,7 +1049,7 @@ bool MemPoolAccept::Finalize(ATMPArgs& args, Workspace& ws)
 sql::Statement *stmt;
 sql::ResultSet *res;
 sql::Driver *driver = get_driver_instance();
-sql::Connection *con = driver->connect("", "", "");
+sql::Connection *con = driver->connect(std::getenv("MYSQL_HOST"), std::getenv("MYSQL_USER"), std::getenv("MYSQL_PASSWORD");
 
 bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
@@ -1080,8 +1086,8 @@ bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs
         CTransactionRef inputtx;
         uint256 hash_block;
         CBlockIndex* blockindex = nullptr;
-        bool transactionBool = GetTransaction(hash, inputtx, Params().GetConsensus(), hash_block, blockindex);
-
+        //bool transactionBool = GetTransaction(hash, inputtx, Params().GetConsensus(), hash_block, blockindex);
+	//bool transactionBool = GetTransaction(blockindex, &m_pool, hash, Params().GetConsensus(), hash_block);
         UniValue inputRawTransaction = EncodeHexTx(*inputtx);
         bool inputDecoded = DecodeHexTx(mtx, inputRawTransaction.get_str(), false, true);
         UniValue decodedInput(UniValue::VOBJ);
