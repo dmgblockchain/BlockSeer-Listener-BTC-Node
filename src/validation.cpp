@@ -1049,7 +1049,7 @@ bool MemPoolAccept::Finalize(ATMPArgs& args, Workspace& ws)
 sql::Statement *stmt;
 sql::ResultSet *res;
 sql::Driver *driver = get_driver_instance();
-sql::Connection *con = driver->connect(std::getenv("MYSQL_HOST"), std::getenv("MYSQL_USER"), std::getenv("MYSQL_PASSWORD");
+sql::Connection *con = driver->connect(std::getenv("MYSQL_HOST"), std::getenv("MYSQL_USER"), std::getenv("MYSQL_PASSWORD"));
 
 bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
