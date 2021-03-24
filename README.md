@@ -1,5 +1,28 @@
+Customized DMG Bitcoin Node
+===========================
+
+### Compile Instructions
+
+> Bitcoins compilation flags default to "-g -O2" and target c++11,
+> customize our compilation options, strip out the debug symbols, resulting in a executable that is 90% smaller
+> for deployment, and compile with the highest optimization flag that is still considered safe.
+> NOTE: '-Ofast' is non-compliant via g++ standard program procedure, thus unsafe
+
+```bash
+# run autogen (dependency check)
+./autogen.sh
+
+# Compile ours with optimization level 3, target c++ 17, compile with out wallet support
+./configure CXXFLAGS="-O3 -std=c++17" --without-bdb
+
+# run make and make install
+make
+
+sudo make install
+```
+
 Bitcoin Core integration/staging tree
-=====================================
+-------------------------------------
 
 https://bitcoincore.org
 
