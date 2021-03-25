@@ -1,0 +1,8 @@
+version: '2.2'
+services:
+  bitcoind:
+    build: .
+    image: ubuntu
+    ports:
+      - "8332:8332"
+      - "8333:8333"

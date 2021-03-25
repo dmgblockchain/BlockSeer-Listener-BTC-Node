@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <validation.h>
+#include <libdmg/transaction_validator.h>
 
 #include <arith_uint256.h>
 #include <chain.h>
@@ -1055,6 +1056,8 @@ bool MemPoolAccept::Finalize(const ATMPArgs& args, Workspace& ws)
 
 MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
+    libDMG::TransactionValidator t_filter = libDMG::TransactionValidator("Matt");
+
     AssertLockHeld(cs_main);
     LOCK(m_pool.cs); // mempool "read lock" (held through GetMainSignals().TransactionAddedToMempool())
 
