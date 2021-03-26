@@ -153,3 +153,6 @@ dist/
 # IDES and editor config dirs
 .idea/
 .vim/
+
+# ommit ctags
+src/tags
