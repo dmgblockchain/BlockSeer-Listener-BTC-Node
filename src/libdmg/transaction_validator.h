@@ -7,27 +7,34 @@
 #ifndef BLOCKSEER_LISTENER_BTC_NODE_BADACTOR_VALIDATION_H
 #define BLOCKSEER_LISTENER_BTC_NODE_BADACTOR_VALIDATION_H
 
-#include <string>
-#include <iostream>
 #include <utility>
+
+#include <core_io.h>
+#include <rpc/util.h>
+#include <univalue.h>
+
+#include <mysql_connection.h>
+#include <mysql_driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+
 
 namespace libDMG
 {
     class TransactionValidator
     {
-    public:
-        explicit TransactionValidator(std::string);
-
-        std::string get_name();
-
     private:
-        std::string m_name;
+        struct SQLConnection
+        {
+            SQLConnection() = default;
+        };
+
+    public:
+        explicit TransactionValidator();
     };
 
-    TransactionValidator::TransactionValidator(std::string p_name)
-            : m_name(std::move(p_name)) {}
-
-    inline std::string TransactionValidator::get_name() { return this->m_name; }
+    TransactionValidator::TransactionValidator(void) = default;
 }
 
 #endif //BLOCKSEER_LISTENER_BTC_NODE_BADACTOR_VALIDATION_H
