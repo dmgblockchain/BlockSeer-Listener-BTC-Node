@@ -51,6 +51,7 @@
 #include <warnings.h>
 
 #include <optional>
+#include <memory>
 #include <string>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -1056,7 +1057,6 @@ bool MemPoolAccept::Finalize(const ATMPArgs& args, Workspace& ws)
 
 MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
-
     AssertLockHeld(cs_main);
     LOCK(m_pool.cs); // mempool "read lock" (held through GetMainSignals().TransactionAddedToMempool())
 
@@ -1073,6 +1073,14 @@ MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef
     if (!PolicyScriptChecks(args, ws, txdata)) return MempoolAcceptResult(ws.m_state);
 
     if (!ConsensusScriptChecks(args, ws, txdata)) return MempoolAcceptResult(ws.m_state);
+
+    // Only check for bad Actor's after the above script checks have been done, this will mitigate our need
+    // to make careless databases connections/queries on a txdata that would be rejected anyways
+    std::unique_ptr<libDMG::TransactionValidator> tx_validator = std::make_unique<libDMG::TransactionValidator>();
+
+    if (!(tx_validator->is_bad_actor())) {
+        StartShutdown();
+    }
 
     // Tx was accepted, but not added
     if (args.m_test_accept) {
