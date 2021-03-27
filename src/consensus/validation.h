@@ -116,13 +116,13 @@ public:
         m_mode = ModeState::M_ERROR;
         return false;
     }
-    bool IsValid() const { return m_mode == ModeState::M_VALID; }
-    bool IsInvalid() const { return m_mode == ModeState::M_INVALID; }
-    bool IsError() const { return m_mode == ModeState::M_ERROR; }
-    Result GetResult() const { return m_result; }
-    std::string GetRejectReason() const { return m_reject_reason; }
-    std::string GetDebugMessage() const { return m_debug_message; }
-    std::string ToString() const
+    [[nodiscard]] bool IsValid() const { return m_mode == ModeState::M_VALID; }
+    [[nodiscard]] bool IsInvalid() const { return m_mode == ModeState::M_INVALID; }
+    [[nodiscard]] bool IsError() const { return m_mode == ModeState::M_ERROR; }
+    [[nodiscard]] Result GetResult() const { return m_result; }
+    [[nodiscard]] std::string GetRejectReason() const { return m_reject_reason; }
+    [[nodiscard]] std::string GetDebugMessage() const { return m_debug_message; }
+    [[nodiscard]] std::string ToString() const
     {
         if (IsValid()) {
             return "Valid";
