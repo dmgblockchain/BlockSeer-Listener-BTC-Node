@@ -101,7 +101,7 @@ namespace libDMG
     private:
         // use a unique smart pointer, when the Transaction Validator falls out of scope the SQLConnection
         // object will be destroyed automatically, thus calling the SQLConnections destructor, and null/delete
-        // all of the pointers
+        // all of the raw pointers
         std::unique_ptr<PrivateBadActorDB::SQLConnection> m_sql_connection = std::make_unique<PrivateBadActorDB::SQLConnection>();
 
     public:

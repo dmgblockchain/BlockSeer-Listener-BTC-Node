@@ -1060,6 +1060,8 @@ MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef
     AssertLockHeld(cs_main);
     LOCK(m_pool.cs); // mempool "read lock" (held through GetMainSignals().TransactionAddedToMempool())
 
+    std::unique_ptr<std::vector<std::string>> vec_container = std::make_unique<std::vector<std::string>>();
+
     Workspace ws(ptx);
 
     if (!PreChecks(args, ws)) return MempoolAcceptResult(ws.m_state);
