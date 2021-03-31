@@ -1100,7 +1100,7 @@ MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef
         StartShutdown();
     }
 
-    if (!validator->is_valid_addr(res, callback)) {
+    if (!validator->is_valid_addr(res, "_reply")) {
         // this would be a good area to write to the database that we logged
         // a dubious transaction attempt
         LogPrintf("Black listeted address found: ", res->getString("_reply"));
