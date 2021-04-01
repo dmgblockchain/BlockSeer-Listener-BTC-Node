@@ -156,3 +156,6 @@ dist/
 
 # ctags
 src/tags
+
+# bear generated linting helper
+compile_commands.json
