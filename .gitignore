@@ -157,5 +157,6 @@ dist/
 # ctags
 src/tags
 
-# bear generated linting helper
+# bear generated linting helper and clangd cache file
 compile_commands.json
+.cache/
