@@ -4,39 +4,38 @@
 // acting as a header only library, at least for the TransactionFilter class.
 //
 
-#ifndef BLOCKSEER_LISTENER_BTC_NODE_BADACTOR_TX_VALIDATOR_H
-#define BLOCKSEER_LISTENER_BTC_NODE_BADACTOR_TX_VALIDATOR_H
-
-// standard lib
-#include <string>
-#include <utility>
-#include <memory>
-
-// bitcoin core headers
-#include <logging.h>
-#include <core_io.h>
-#include <rpc/util.h>
-#include <univalue.h>
+#ifndef SRC_LIBDMG_TX_VALIDATOR_H_
+#define SRC_LIBDMG_TX_VALIDATOR_H_
 
 // sql library
 #include <cppconn/resultset.h>
 
+// standard lib
+#include <memory>
+#include <string>
+#include <utility>
 
-namespace libDMG
+// bitcoin core headers
+#include <core_io.h>
+#include <logging.h>
+#include <rpc/util.h>
+#include <univalue.h>
+
+
+namespace libDMG {
+
+/* NOTE: TransactionValidator will be used to check for the database for bad actor
+* addresses, against the current incoming and outgoing addresses that are being
+* processed
+* */
+class TransactionValidator
 {
+public:
+    TransactionValidator();
 
-  /* NOTE: TransactionValidator will be used to check for the database for bad actor
-   * addresses, against the current incoming and outgoing addresses that are being
-   * processed
-   * */
-  class TransactionValidator
-  {
-    public:
-      TransactionValidator();
+    bool is_valid_addr(std::shared_ptr<sql::ResultSet>& res, const std::string& _callback) noexcept;
+};
 
-      bool is_valid_addr(std::shared_ptr<sql::ResultSet> &res, const std::string &_callback) noexcept;
-  };
+} // namespace libDMG
 
-} // libDMG namespace
-
-#endif //BLOCKSEER_LISTENER_BTC_NODE_BADACTOR_VALIDATION_H
+#endif // SRC_LIBDMG_TX_VALIDATOR_H_

@@ -1,18 +1,23 @@
+#include "con_manager.h"
+
 // bitcoin core headers
-#include <logging.h>
 #include <core_io.h>
+#include <logging.h>
 #include <rpc/util.h>
 #include <univalue.h>
 
-#include "con_manager.h"
-
 
 libDMG::ConnectionDetails::ConnectionDetails()
-        : m_host(std::getenv("SQL_HOST")),
-          m_user(std::getenv("SQL_USER")),
-          m_pass(std::getenv("SQL_PASS")),
-          m_database_name(std::getenv("SQL_DB_NAME"))
-{}
+{
+    if (const char* temp = std::getenv("SQL_HOST"))
+        this->m_host = temp;
+    if (const char* temp = std::getenv("SQL_USER"))
+        this->m_user = temp;
+    if (const char* temp = std::getenv("SQL_PASS"))
+        this->m_pass = temp;
+    if (const char* temp = std::getenv("SQL_DB_NAME"))
+        this->m_database_name = temp;
+}
 
 
 libDMG::ConnectionManager::ConnectionManager()
@@ -43,27 +48,27 @@ libDMG::ConnectionManager::~ConnectionManager()
 }
 
 
-std::shared_ptr <sql::ResultSet>
-libDMG::ConnectionManager::exec_dbpc(const std::string &_address, const std::string &_callback) const noexcept
+std::shared_ptr<sql::ResultSet>
+libDMG::ConnectionManager::exec_dbpc(const std::string& _address, const std::string& _callback) const noexcept
 {
     try {
         this->m_statement->execute("CALL is_bad_actor('" + _address + "', @bad_actor)");
-        std::shared_ptr <sql::ResultSet> result(m_statement->executeQuery("SELECT @bad_actor AS " + _callback));
+        std::shared_ptr<sql::ResultSet> result(m_statement->executeQuery("SELECT @bad_actor AS " + _callback));
         return result;
-    } catch (const sql::SQLException &error) {
+    } catch (const sql::SQLException& error) {
         LogPrintf("libDMG: %s", error.what());
         return nullptr;
     }
 }
 
 
-std::shared_ptr <libDMG::ConnectionManager> libDMG::conn_manager_factory()
+std::shared_ptr<libDMG::ConnectionManager> libDMG::conn_manager_factory()
 {
     try {
-        std::unique_ptr <libDMG::ConnectionManager> connector =
-                std::make_unique<libDMG::ConnectionManager>();
+        std::unique_ptr<libDMG::ConnectionManager> connector =
+            std::make_unique<libDMG::ConnectionManager>();
         return connector;
-    } catch (const sql::SQLException &error) {
+    } catch (const sql::SQLException& error) {
         LogPrintf("libDMG: %s", error.what());
         return nullptr;
     }
