@@ -3,11 +3,16 @@
 // bitcoin core headers
 #include <core_io.h>
 #include <logging.h>
+#include <memory>
 #include <rpc/util.h>
 #include <univalue.h>
 
 
 libDMG::ConnectionDetails::ConnectionDetails()
+    : m_host(""),
+      m_user(""),
+      m_pass(""),
+      m_database_name("")
 {
     if (const char* temp = std::getenv("SQL_HOST"))
         this->m_host = temp;
