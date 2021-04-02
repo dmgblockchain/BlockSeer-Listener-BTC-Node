@@ -3,23 +3,50 @@ Customized DMG Bitcoin Node
 
 ### Compile Instructions
 
+> Bitcoin is a monolithic architecture, and it's build system is tightly coupled,
+> read carefully and don't skip a step.
 > Bitcoins compilation flags default to "-g -O2" and target c++11,
 > customize our compilation options, strip out the debug symbols, resulting in a executable that is 90% smaller
 > for deployment, and compile with the highest optimization flag that is still considered safe.
 > NOTE: '-Ofast' is non-compliant via g++ standard program procedure, thus unsafe
 
 ```bash
-# run autogen (dependency check)
-./autogen.sh
+# depends directory
 
-# Compile ours with optimization level 3, target c++ 17, compile with out wallet support
-./configure CXXFLAGS="-O3 -std=c++17" --without-bdb
+$ cd depends
 
-# run make and make install
-make
+# bitcoin has a built-in Arch/OS specific configuration generator for the build process.
+# Here we want to be as efficient as possible, run make with 6 jobs to speed up the compilation,
+# NOTE: make -j if given no arguments and left to its own predilections will consume all cpu power
+# and crash the machine (An unforgiving mistress indeed), 6 jobs is the recommended value.
+# Ommit the QT framework, QR etc.
+# This will build a bitcoin core binary for the machine it is being compiled on. 
+# No cross platform bloat, or uneccessary libraries built in
 
-sudo make install
+$ make -j 6 NO_QT=1 NO_QR=1 NO_WALLET=1 NO_BDB=1
+
+# This will generata a x86_64-pc-linux-gnu foler holding our custom compilation environment
+# cd .. to the root and run autogen.sh to further configure dependencies
+
+$ ./autogen.sh
+
+# We need to point the conifigure script to our custom compilation folder
+# the default flags compile with wallet support on and debug symbols on with -g -O2 and c++11
+# Compile ours with optimization level 3, target c++ 17, and omit debug symbols, statically link the sql library on configure
+
+# If in fish shell
+$ ./configure CXXFLAGS="-O3 -std=c++17" LDFLAGS="-L/usr/lib/mysqlcppconn -L/usr/lib -lmysqlcppconn -lmysqlcppconn-static" --prefix=(pwd)/depends/x86_64-pc-linux-gnu/
+
+# if bash or zsh etc
+$ ./configure CXXFLAGS="-O3 -std=c++17" LDFLAGS="-L/usr/lib/mysqlcppconn -L/usr/lib -lmysqlcppconn -lmysqlcppconn-static" --prefix=`pwd`/depends/x86_64-pc-linux-gnu/
+
+# now just make and make install
+
+# NOTE: -j stands for the number of jobs, The rule of thumb is $(cpu_cores) * 1.5 give or take.
+# WARNING: running the make -j option with no integer argument will consume all cpu and crash your machine
+$ make -j 6 && sudo make install
 ```
+
 
 Bitcoin Core integration/staging tree
 -------------------------------------
