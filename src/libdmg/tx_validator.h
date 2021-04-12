@@ -33,7 +33,7 @@ class TransactionValidator
 public:
     TransactionValidator();
 
-    bool is_valid_addr(std::shared_ptr<sql::ResultSet>& res, const std::string& _callback) noexcept;
+    bool is_valid_addr(const std::shared_ptr<sql::ResultSet>& res, const std::string& _callback) const noexcept;
 };
 
 } // namespace libDMG

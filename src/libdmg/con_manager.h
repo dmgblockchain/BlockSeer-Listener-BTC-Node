@@ -74,7 +74,7 @@ public:
 
 // A safe way to build a connection, this is so I don't have to pollute the
 // bitcoin code with try and catch, and deal with try/catch scoping limitations
-std::shared_ptr<libDMG::ConnectionManager> conn_manager_factory();
+std::shared_ptr<libDMG::ConnectionManager> conn_manager_factory() noexcept;
 } // namespace libDMG
 
 #endif // SRC_LIBDMG_CON_MANAGER_H_

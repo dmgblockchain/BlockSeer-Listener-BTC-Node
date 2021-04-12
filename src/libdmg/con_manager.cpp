@@ -37,6 +37,7 @@ libDMG::ConnectionManager::ConnectionManager()
 
 libDMG::ConnectionManager::~ConnectionManager()
 {
+    LogPrintf("++ ================== DESTROYING (%s) ===================== ++\n", __func__);
     // Close the connection, it will reconnect
     // when ever ConnectionManager instantiates
     if (!(this->m_internal_con->isClosed()))
@@ -56,6 +57,10 @@ libDMG::ConnectionManager::~ConnectionManager()
 std::shared_ptr<sql::ResultSet>
 libDMG::ConnectionManager::exec_dbpc(const std::string& _address, const std::string& _callback) const noexcept
 {
+    if (true) {
+        return nullptr;
+    }
+
     try {
         this->m_statement->execute("CALL is_bad_actor('" + _address + "', @bad_actor)");
         std::shared_ptr<sql::ResultSet> result(m_statement->executeQuery("SELECT @bad_actor AS " + _callback));
@@ -67,8 +72,9 @@ libDMG::ConnectionManager::exec_dbpc(const std::string& _address, const std::str
 }
 
 
-std::shared_ptr<libDMG::ConnectionManager> libDMG::conn_manager_factory()
+std::shared_ptr<libDMG::ConnectionManager> libDMG::conn_manager_factory() noexcept
 {
+    LogPrintf("++ ================== IN (%s) ===================== ++\n", __func__);
     try {
         std::unique_ptr<libDMG::ConnectionManager> connector =
             std::make_unique<libDMG::ConnectionManager>();
