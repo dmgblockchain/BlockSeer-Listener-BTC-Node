@@ -4,7 +4,7 @@
 
 # Pattern rule to print variables, e.g. make print-top_srcdir
 print-%:
-	@echo '$*' = '$($*)'
+	@echo '$*'='$($*)'
 
 DIST_SUBDIRS = secp256k1 univalue
 
@@ -244,7 +244,6 @@ BITCOIN_CORE_H = \
   util/moneystr.h \
   util/rbf.h \
   util/readwritefile.h \
-  util/ref.h \
   util/settings.h \
   util/sock.h \
   util/spanparsing.h \

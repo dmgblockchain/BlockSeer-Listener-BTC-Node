@@ -158,3 +158,4 @@ dist/
 src/tags
 .cache
 compile_commands.json
+/guix-build-*

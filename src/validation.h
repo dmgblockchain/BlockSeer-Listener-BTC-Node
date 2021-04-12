@@ -457,7 +457,7 @@ public:
         const CChainParams& chainparams,
         CBlockIndex** ppindex) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
-    CBlockIndex* LookupBlockIndex(const uint256& hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    CBlockIndex* LookupBlockIndex(const uint256& hash) const EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
     /** Find the last common block between the parameter chain and a locator. */
     CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& locator) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
@@ -1029,7 +1029,7 @@ inline bool IsBlockPruned(const CBlockIndex* pblockindex)
 /**
  * Return the expected assumeutxo value for a given height, if one exists.
  *
- * @param height[in] Get the assumeutxo value for this height.
+ * @param[in] height Get the assumeutxo value for this height.
  *
  * @returns empty if no assumeutxo configuration exists for the given height.
  */

@@ -171,7 +171,7 @@ namespace {
     std::set<int> setDirtyFileInfo;
 } // anon namespace
 
-CBlockIndex* BlockManager::LookupBlockIndex(const uint256& hash)
+CBlockIndex* BlockManager::LookupBlockIndex(const uint256& hash) const
 {
     AssertLockHeld(cs_main);
     assert(std::addressof(g_chainman.BlockIndex()) == std::addressof(m_block_index));
@@ -692,7 +692,8 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
         }
     }
 
-    // Bring the best block into scope
+    // This is const, but calls into the back end CoinsViews. The CCoinsViewDB at the bottom of the
+    // hierarchy brings the best block into scope. See CCoinsViewDB::GetBestBlock().
     m_view.GetBestBlock();
 
     // we have all inputs cached now, so switch back to dummy (to protect
@@ -1111,9 +1112,9 @@ static MempoolAcceptResult AcceptToMemoryPoolWithTime(const CChainParams& chainp
     assert(std::addressof(::ChainstateActive()) == std::addressof(active_chainstate));
     const MempoolAcceptResult result = MemPoolAccept(pool, active_chainstate).AcceptSingleTransaction(tx, args);
     if (result.m_result_type != MempoolAcceptResult::ResultType::VALID) {
-        // Remove coins that were not present in the coins cache before calling ATMPW;
-        // this is to prevent memory DoS in case we receive a large number of
-        // invalid transactions that attempt to overrun the in-memory coins cache
+        // Remove coins that were not present in the coins cache before calling
+        // AcceptSingleTransaction(); this is to prevent memory DoS in case we receive a large
+        // number of invalid transactions that attempt to overrun the in-memory coins cache
         // (`CCoinsViewCache::cacheCoins`).
 
         for (const COutPoint& hashTx : coins_to_uncache)
@@ -5434,6 +5435,15 @@ bool ChainstateManager::PopulateAndValidateSnapshot(
 
     assert(coins_cache.GetBestBlock() == base_blockhash);
 
+    CBlockIndex* snapshot_start_block = WITH_LOCK(::cs_main, return m_blockman.LookupBlockIndex(base_blockhash));
+
+    if (!snapshot_start_block) {
+        // Needed for GetUTXOStats to determine the height
+        LogPrintf("[snapshot] Did not find snapshot start blockheader %s\n",
+                  base_blockhash.ToString());
+        return false;
+    }
+
     CCoinsStats stats;
     auto breakpoint_fnc = [] { /* TODO insert breakpoint here? */ };
 
@@ -5443,31 +5453,6 @@ bool ChainstateManager::PopulateAndValidateSnapshot(
 
     if (!GetUTXOStats(snapshot_coinsdb, WITH_LOCK(::cs_main, return std::ref(m_blockman)), stats, CoinStatsHashType::HASH_SERIALIZED, breakpoint_fnc)) {
         LogPrintf("[snapshot] failed to generate coins stats\n");
-        return false;
-    }
-
-    // Ensure that the base blockhash appears in the known chain of valid headers. We're willing to
-    // wait a bit here because the snapshot may have been loaded on startup, before we've
-    // received headers from the network.
-
-    int max_secs_to_wait_for_headers = 60 * 10;
-    CBlockIndex* snapshot_start_block = nullptr;
-
-    while (max_secs_to_wait_for_headers > 0) {
-        snapshot_start_block = WITH_LOCK(::cs_main,
-            return m_blockman.LookupBlockIndex(base_blockhash));
-        --max_secs_to_wait_for_headers;
-
-        if (!snapshot_start_block) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        } else {
-            break;
-        }
-    }
-
-    if (snapshot_start_block == nullptr) {
-        LogPrintf("[snapshot] timed out waiting for snapshot start blockheader %s\n",
-            base_blockhash.ToString());
         return false;
     }
 
