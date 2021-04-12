@@ -113,8 +113,18 @@ if BUILD_BITCOIN_UTIL
 endif
 
 .PHONY: FORCE check-symbols check-security
+
+LIB_DMG_H = \
+  libdmg/con_manager.h \
+  libdmg/tx_validator.h \
+
+LIB_DMG_CPP = \
+  libdmg/con_manager.cpp \
+  libdmg/tx_validator.cpp \
+
 # bitcoin core #
 BITCOIN_CORE_H = \
+  $(LIB_DMG_H) \
   addrdb.h \
   addrman.h \
   attributes.h \
@@ -306,6 +316,7 @@ libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(NATPMP_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
+  $(LIB_DMG_CPP) \
   addrdb.cpp \
   addrman.cpp \
   banman.cpp \
@@ -634,7 +645,8 @@ bitcoin_bin_ldadd += $(BOOST_LIBS) $(BDB_LIBS) $(MINIUPNPC_LIBS) $(NATPMP_LIBS) 
 
 bitcoind_SOURCES = $(bitcoin_daemon_sources)
 bitcoind_CPPFLAGS = $(bitcoin_bin_cppflags)
-bitcoind_CXXFLAGS = $(bitcoin_bin_cxxflags) -I/usr/include -I/usr/include/cppconn -lmysqlcppconn
+bitcoind_CXXFLAGS = $(bitcoin_bin_cxxflags)
+
 bitcoind_LDFLAGS = $(bitcoin_bin_ldflags)
 bitcoind_LDADD = $(LIBBITCOIN_SERVER) $(bitcoin_bin_ldadd)
 
