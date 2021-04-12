@@ -4,7 +4,9 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <validation.h>
-#include <libdmg/transaction_validator.h>
+#include <libdmg/tx_validator.h>
+#include <libdmg/con_manager.h>
+
 
 #include <arith_uint256.h>
 #include <chain.h>
@@ -1058,10 +1060,17 @@ bool MemPoolAccept::Finalize(const ATMPArgs& args, Workspace& ws)
 
 MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
+    /* Build our objects first, if connection fails for some reason, request a safe shutdown through
+     * the bitcoin core approved function
+     * */
+    auto con = libDMG::conn_manager_factory();
+    if (con == nullptr) {
+        StartShutdown();
+    }
+    std::unique_ptr<libDMG::TransactionValidator> validator = std::make_unique<libDMG::TransactionValidator>();
+
     AssertLockHeld(cs_main);
     LOCK(m_pool.cs); // mempool "read lock" (held through GetMainSignals().TransactionAddedToMempool())
-
-    std::unique_ptr<std::vector<std::string>> vec_container = std::make_unique<std::vector<std::string>>();
 
     Workspace ws(ptx);
 
@@ -1073,17 +1082,35 @@ MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef
     // checks pass, to mitigate CPU exhaustion denial-of-service attacks.
     PrecomputedTransactionData txdata;
 
+    // NOTE: Next PR will include code for stripping the addresses out of vin and vout
+
     if (!PolicyScriptChecks(args, ws, txdata)) return MempoolAcceptResult(ws.m_state);
 
     if (!ConsensusScriptChecks(args, ws, txdata)) return MempoolAcceptResult(ws.m_state);
 
-    // Only check for bad Actor's after the above script checks have been done, this will mitigate our need
+    // NOTE: Only check for bad Actor's after the above script checks have been done, this will mitigate our need
     // to make careless databases connections/queries on a txdata that would be rejected anyways
-    std::unique_ptr<libDMG::TransactionValidator> tx_validator = std::make_unique<libDMG::TransactionValidator>();
 
-    if (!(tx_validator->is_bad_actor())) {
+
+    // NOTE: The '_reply' string is an arbitrary string, it is a requirement by the sql
+    // library. it is needed to retrieve the actual data in the getString method
+    auto res = con->exec_dbpc("1Ph1WdXbfCmnYzqJiCS8FnntaS1jijMjHq", "_reply");
+    if (res == nullptr) {
+        // we've had a failure when returning from the database procedure call
+        // use bitcoins safe shutdown call
         StartShutdown();
     }
+
+    if (!validator->is_valid_addr(res, "_reply")) {
+        // this would be a good area to write to the database that we logged
+        // a dubious transaction attempt
+        LogPrintf("Black listeted address found: ", res->getString("_reply"));
+
+        // MempoolAcceptResult has two constructors, the failure constructor takes
+        // exactly 1 argument, the success constructor takes exactly 2
+        return MempoolAcceptResult(ws.m_state);
+    }
+
 
     // Tx was accepted, but not added
     if (args.m_test_accept) {
