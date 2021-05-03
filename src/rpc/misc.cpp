@@ -5,8 +5,12 @@
 
 #include <httpserver.h>
 #include <index/blockfilterindex.h>
+#include <index/coinstatsindex.h>
 #include <index/txindex.h>
 #include <interfaces/chain.h>
+#include <interfaces/echo.h>
+#include <interfaces/init.h>
+#include <interfaces/ipc.h>
 #include <key_io.h>
 #include <node/context.h>
 #include <outputtype.h>
@@ -90,7 +94,7 @@ static RPCHelpMan createmultisig()
                         {
                             {"key", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "The hex-encoded public key"},
                         }},
-                    {"address_type", RPCArg::Type::STR, /* default */ "legacy", "The address type to use. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\"."},
+                    {"address_type", RPCArg::Type::STR, RPCArg::Default{"legacy"}, "The address type to use. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\"."},
                 },
                 RPCResult{
                     RPCResult::Type::OBJ, "", "",
@@ -475,7 +479,7 @@ static RPCHelpMan getmemoryinfo()
     return RPCHelpMan{"getmemoryinfo",
                 "Returns an object containing information about memory usage.\n",
                 {
-                    {"mode", RPCArg::Type::STR, /* default */ "\"stats\"", "determines what kind of information is returned.\n"
+                    {"mode", RPCArg::Type::STR, RPCArg::Default{"stats"}, "determines what kind of information is returned.\n"
             "  - \"stats\" returns general statistics about memory usage in the daemon.\n"
             "  - \"mallocinfo\" returns an XML string describing low-level heap state (only available if compiled with glibc 2.10+)."},
                 },
@@ -644,6 +648,43 @@ static RPCHelpMan echo(const std::string& name)
 static RPCHelpMan echo() { return echo("echo"); }
 static RPCHelpMan echojson() { return echo("echojson"); }
 
+static RPCHelpMan echoipc()
+{
+    return RPCHelpMan{
+        "echoipc",
+        "\nEcho back the input argument, passing it through a spawned process in a multiprocess build.\n"
+        "This command is for testing.\n",
+        {{"arg", RPCArg::Type::STR, RPCArg::Optional::NO, "The string to echo",}},
+        RPCResult{RPCResult::Type::STR, "echo", "The echoed string."},
+        RPCExamples{HelpExampleCli("echo", "\"Hello world\"") +
+                    HelpExampleRpc("echo", "\"Hello world\"")},
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue {
+            std::unique_ptr<interfaces::Echo> echo;
+            if (interfaces::Ipc* ipc = Assert(EnsureAnyNodeContext(request.context).init)->ipc()) {
+                // Spawn a new bitcoin-node process and call makeEcho to get a
+                // client pointer to a interfaces::Echo instance running in
+                // that process. This is just for testing. A slightly more
+                // realistic test spawning a different executable instead of
+                // the same executable would add a new bitcoin-echo executable,
+                // and spawn bitcoin-echo below instead of bitcoin-node. But
+                // using bitcoin-node avoids the need to build and install a
+                // new executable just for this one test.
+                auto init = ipc->spawnProcess("bitcoin-node");
+                echo = init->makeEcho();
+                ipc->addCleanup(*echo, [init = init.release()] { delete init; });
+            } else {
+                // IPC support is not available because this is a bitcoind
+                // process not a bitcoind-node process, so just create a local
+                // interfaces::Echo object and return it so the `echoipc` RPC
+                // method will work, and the python test calling `echoipc`
+                // can expect the same result.
+                echo = interfaces::MakeEcho();
+            }
+            return echo->echo(request.params[0].get_str());
+        },
+    };
+}
+
 static UniValue SummaryToJSON(const IndexSummary&& summary, std::string index_name)
 {
     UniValue ret_summary(UniValue::VOBJ);
@@ -689,6 +730,10 @@ static RPCHelpMan getindexinfo()
         result.pushKVs(SummaryToJSON(g_txindex->GetSummary(), index_name));
     }
 
+    if (g_coin_stats_index) {
+        result.pushKVs(SummaryToJSON(g_coin_stats_index->GetSummary(), index_name));
+    }
+
     ForEachBlockFilterIndex([&result, &index_name](const BlockFilterIndex& index) {
         result.pushKVs(SummaryToJSON(index.GetSummary(), index_name));
     });
@@ -719,6 +764,7 @@ static const CRPCCommand commands[] =
     { "hidden",             &mockscheduler,           },
     { "hidden",             &echo,                    },
     { "hidden",             &echojson,                },
+    { "hidden",             &echoipc,                 },
 };
 // clang-format on
     for (const auto& c : commands) {

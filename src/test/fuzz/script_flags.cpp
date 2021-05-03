@@ -41,6 +41,10 @@ FUZZ_TARGET_INIT(script_flags, initialize_script_flags)
         for (unsigned i = 0; i < tx.vin.size(); ++i) {
             CTxOut prevout;
             ds >> prevout;
+            if (!MoneyRange(prevout.nValue)) {
+                // prevouts should be consensus-valid
+                prevout.nValue = 1;
+            }
             spent_outputs.push_back(prevout);
         }
         PrecomputedTransactionData txdata;
@@ -48,7 +52,7 @@ FUZZ_TARGET_INIT(script_flags, initialize_script_flags)
 
         for (unsigned i = 0; i < tx.vin.size(); ++i) {
             const CTxOut& prevout = txdata.m_spent_outputs.at(i);
-            const TransactionSignatureChecker checker{&tx, i, prevout.nValue, txdata};
+            const TransactionSignatureChecker checker{&tx, i, prevout.nValue, txdata, MissingDataBehavior::ASSERT_FAIL};
 
             ScriptError serror;
             const bool ret = VerifyScript(tx.vin.at(i).scriptSig, prevout.scriptPubKey, &tx.vin.at(i).scriptWitness, verify_flags, checker, &serror);

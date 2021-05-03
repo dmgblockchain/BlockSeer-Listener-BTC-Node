@@ -131,7 +131,7 @@ export JOBS=1 ADDITIONAL_GUIX_COMMON_FLAGS='--max-jobs=8'
 From the top of a clean Bitcoin Core repository:
 
 ```sh
-./contrib/guix/guix-build.sh
+./contrib/guix/guix-build
 ```
 
 After the build finishes successfully (check the status code please), compare
@@ -167,7 +167,7 @@ find output/ -type f -print0 | sort -z | xargs -r0 sha256sum
   Set the path where _extracted_ SDKs can be found. This is passed through to
   the depends tree. Note that this is should be set to the _parent_ directory of
   the actual SDK (e.g. SDK_PATH=$HOME/Downloads/macOS-SDKs instead of
-  $HOME/Downloads/macOS-SDKs/Xcode-11.3.1-11C505-extracted-SDK-with-libcxx-headers).
+  $HOME/Downloads/macOS-SDKs/Xcode-12.1-12A7403-extracted-SDK-with-libcxx-headers).
 
 * _**JOBS**_
 
@@ -205,10 +205,7 @@ find output/ -type f -print0 | sort -z | xargs -r0 sha256sum
 
 * _**ADDITIONAL_GUIX_COMMON_FLAGS**_
 
-  Additional flags to be passed to all `guix` commands. For a fully-bootstrapped
-  build, set this to `--bootstrap --no-substitutes` (refer to the [security
-  model section](#choosing-your-security-model) for more details). Note that a
-  fully-bootstrapped build will take quite a long time on the first run.
+  Additional flags to be passed to all `guix` commands.
 
 * _**ADDITIONAL_GUIX_TIMEMACHINE_FLAGS**_
 

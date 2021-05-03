@@ -231,15 +231,11 @@ CTxDestination AddAndGetMultisigDestination(const int required, const std::vecto
     if ((int)pubkeys.size() < required) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("not enough keys supplied (got %u keys, but need at least %d to redeem)", pubkeys.size(), required));
     }
-    if (pubkeys.size() > 16) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Number of keys involved in the multisignature address creation > 16\nReduce the number");
+    if (pubkeys.size() > MAX_PUBKEYS_PER_MULTISIG) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Number of keys involved in the multisignature address creation > %d\nReduce the number", MAX_PUBKEYS_PER_MULTISIG));
     }
 
     script_out = GetScriptForMultisig(required, pubkeys);
-
-    if (script_out.size() > MAX_SCRIPT_ELEMENT_SIZE) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, (strprintf("redeemScript exceeds size limit: %d > %d", script_out.size(), MAX_SCRIPT_ELEMENT_SIZE)));
-    }
 
     // Check if any keys are uncompressed. If so, the type is legacy
     for (const CPubKey& pk : pubkeys) {
@@ -247,6 +243,10 @@ CTxDestination AddAndGetMultisigDestination(const int required, const std::vecto
             type = OutputType::LEGACY;
             break;
         }
+    }
+
+    if (type == OutputType::LEGACY && script_out.size() > MAX_SCRIPT_ELEMENT_SIZE) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, (strprintf("redeemScript exceeds size limit: %d > %d", script_out.size(), MAX_SCRIPT_ELEMENT_SIZE)));
     }
 
     // Make the address
@@ -498,6 +498,33 @@ RPCHelpMan::RPCHelpMan(std::string name, std::string description, std::vector<RP
         for (const std::string& name : names) {
             CHECK_NONFATAL(named_args.insert(name).second);
         }
+        // Default value type should match argument type only when defined
+        if (arg.m_fallback.index() == 2) {
+            const RPCArg::Type type = arg.m_type;
+            switch (std::get<RPCArg::Default>(arg.m_fallback).getType()) {
+            case UniValue::VOBJ:
+                CHECK_NONFATAL(type == RPCArg::Type::OBJ);
+                break;
+            case UniValue::VARR:
+                CHECK_NONFATAL(type == RPCArg::Type::ARR);
+                break;
+            case UniValue::VSTR:
+                CHECK_NONFATAL(type == RPCArg::Type::STR || type == RPCArg::Type::STR_HEX || type == RPCArg::Type::AMOUNT);
+                break;
+            case UniValue::VNUM:
+                CHECK_NONFATAL(type == RPCArg::Type::NUM || type == RPCArg::Type::AMOUNT || type == RPCArg::Type::RANGE);
+                break;
+            case UniValue::VBOOL:
+                CHECK_NONFATAL(type == RPCArg::Type::BOOL);
+                break;
+            case UniValue::VNULL:
+                // Null values are accepted in all arguments
+                break;
+            default:
+                CHECK_NONFATAL(false);
+                break;
+            }
+        }
     }
 }
 
@@ -646,7 +673,7 @@ std::string RPCArg::GetName() const
 
 bool RPCArg::IsOptional() const
 {
-    if (m_fallback.index() == 1) {
+    if (m_fallback.index() != 0) {
         return true;
     } else {
         return RPCArg::Optional::NO != std::get<RPCArg::Optional>(m_fallback);
@@ -694,7 +721,9 @@ std::string RPCArg::ToDescriptionString() const
         } // no default case, so the compiler can warn about missing cases
     }
     if (m_fallback.index() == 1) {
-        ret += ", optional, default=" + std::get<std::string>(m_fallback);
+        ret += ", optional, default=" + std::get<RPCArg::DefaultHint>(m_fallback);
+    } else if (m_fallback.index() == 2) {
+        ret += ", optional, default=" + std::get<RPCArg::Default>(m_fallback).write();
     } else {
         switch (std::get<RPCArg::Optional>(m_fallback)) {
         case RPCArg::Optional::OMITTED: {
