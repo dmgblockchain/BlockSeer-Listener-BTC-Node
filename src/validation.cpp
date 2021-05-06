@@ -6,7 +6,6 @@
 #include <libdmg/con_manager.h>
 #include <libdmg/tx_validator.h>
 
-#include <validation.h>
 #include <arith_uint256.h>
 #include <chain.h>
 #include <chainparams.h>
@@ -48,6 +47,7 @@
 #include <util/strencodings.h>
 #include <util/system.h>
 #include <util/translation.h>
+#include <validation.h>
 #include <validationinterface.h>
 #include <warnings.h>
 
@@ -2559,7 +2559,7 @@ bool CChainState::DisconnectTip(BlockValidationState& state, const CChainParams&
     }
 
     m_chain.SetTip(pindexDelete->pprev);
-    
+
     LogPrintf("================ IN (%s) =================\n", __func__);
     UpdateTip(m_mempool, pindexDelete->pprev, chainparams, *this);
     // Let wallets know transactions went from 1-confirmed to
