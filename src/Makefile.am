@@ -117,11 +117,11 @@ endif
 
 LIB_DMG_H = \
   libdmg/con_manager.h \
-  libdmg/tx_validator.h \
+  libdmg/tx_validator.h
 
 LIB_DMG_CPP = \
   libdmg/con_manager.cpp \
-  libdmg/tx_validator.cpp \
+  libdmg/tx_validator.cpp
 
 # bitcoin core #
 BITCOIN_CORE_H = \
