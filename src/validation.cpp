@@ -1047,10 +1047,10 @@ MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef
     /* Build our objects first, if connection fails for some reason, request a safe shutdown through
      * the bitcoin core approved function
      * */
+    LogPrintf("================= IN (%s) ========================\n", __func__);
     auto con = libDMG::conn_manager_factory();
-    if (con == nullptr) {
-        StartShutdown();
-    }
+    if (con == nullptr) StartShutdown();
+
     std::unique_ptr<libDMG::TransactionValidator> validator = std::make_unique<libDMG::TransactionValidator>();
 
     AssertLockHeld(cs_main);
@@ -2252,6 +2252,7 @@ static void UpdateTip(CTxMemPool& mempool, const CBlockIndex* pindexNew, const C
             }
         }
     }
+    LogPrintf("================= IN (%s) ========================\n", __func__);
     assert(std::addressof(::ChainstateActive()) == std::addressof(active_chainstate));
     LogPrintf("%s: new best=%s height=%d version=0x%08x log2_work=%f tx=%lu date='%s' progress=%f cache=%.1fMiB(%utxo)%s\n", __func__,
       pindexNew->GetBlockHash().ToString(), pindexNew->nHeight, pindexNew->nVersion,
@@ -2312,6 +2313,8 @@ bool CChainState::DisconnectTip(BlockValidationState& state, const CChainParams&
     }
 
     m_chain.SetTip(pindexDelete->pprev);
+
+    LogPrintf("================= IN (%s) ========================\n", __func__);
 
     UpdateTip(m_mempool, pindexDelete->pprev, chainparams, *this);
     // Let wallets know transactions went from 1-confirmed to
@@ -2421,6 +2424,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, const CChainParams& ch
     disconnectpool.removeForBlock(blockConnecting.vtx);
     // Update m_chain & related variables.
     m_chain.SetTip(pindexNew);
+    LogPrintf("================= IN (%s) ========================\n", __func__);
     UpdateTip(m_mempool, pindexNew, chainparams, *this);
 
     int64_t nTime6 = GetTimeMicros(); nTimePostConnect += nTime6 - nTime5; nTimeTotal += nTime6 - nTime1;
@@ -3391,6 +3395,7 @@ bool BlockManager::AcceptBlockHeader(const CBlockHeader& block, BlockValidationS
 // Exposed wrapper for AcceptBlockHeader
 bool ChainstateManager::ProcessNewBlockHeaders(const std::vector<CBlockHeader>& headers, BlockValidationState& state, const CChainParams& chainparams, const CBlockIndex** ppindex)
 {
+    LogPrintf("================= IN (%s) ========================\n", __func__);
     assert(std::addressof(::ChainstateActive()) == std::addressof(ActiveChainstate()));
     AssertLockNotHeld(cs_main);
     {
