@@ -2389,8 +2389,16 @@ Poznámka: Keďže poplatok je počítaný za bajt, poplatok o hodnote "100 sato
         <translation>Potvrdiť návrh transakcie</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Skopírovať PSBT do schránky</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Odoslať</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT skopírovaný</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>

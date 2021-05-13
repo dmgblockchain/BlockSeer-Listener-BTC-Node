@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Cím vagy címke szerkesztéséhez kattints a jobb gombbal</translation>
+        <translation>A cím vagy címke szerkesztéséhez kattints a jobb gombbal</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -483,22 +483,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>Naprakész</translation>
     </message>
     <message>
-        <source>&amp;Load PSBT from file...</source>
-        <translation>&amp;PSBT betöltése fájlból.</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction</source>
-        <translation>Részlegesen aláírt Bitcoin tranzakció (PSBT) betöltése</translation>
-    </message>
-    <message>
-        <source>Load PSBT from clipboard...</source>
-        <translation>PSBT betöltése vágólapról</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
-        <translation>Részlegesen aláírt Bitcoin tranzakció (PSBT) betöltése vágólapról</translation>
-    </message>
-    <message>
         <source>Node window</source>
         <translation>Csomópont ablak</translation>
     </message>
@@ -871,14 +855,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>Üres tárca készítése</translation>
     </message>
     <message>
-        <source>Use descriptors for scriptPubKey management</source>
-        <translation>Leírók használata scriptPubKey menedzseléshez</translation>
-    </message>
-    <message>
-        <source>Descriptor Wallet</source>
-        <translation>Descriptor Tárca</translation>
-    </message>
-    <message>
         <source>Create</source>
         <translation>Létrehozás</translation>
     </message>
@@ -1052,11 +1028,11 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message numerus="yes">
         <source>(of %n GB needed)</source>
-        <translation><numerusform>(%n GB szükségesnek)</numerusform><numerusform>(%n GB szükségesnek)</numerusform></translation>
+        <translation><numerusform>(a szükséges %n GB-ból)</numerusform><numerusform>(a szükséges %n GB-ból)</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>(%n GB needed for full chain)</source>
-        <translation><numerusform>(%n GB szükséges a teljes lánchoz)</numerusform><numerusform>(%n GB szükséges a teljes lánchoz)</numerusform></translation>
+        <translation><numerusform>(%n GB szükséges a teljes sorozathoz)</numerusform><numerusform>(%n GB szükséges a teljes lánchoz)</numerusform></translation>
     </message>
 </context>
 <context>
@@ -1857,7 +1833,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>To specify a non-default location of the data directory use the '%1' option.</source>
-        <translation>Az adat könyvárhoz kívánt nem alapértelmezett elérési úthoz használd a '%1' opciót</translation>
+        <translation>A nem alapértelmezett elérési út használatához használd a '%1' opciót</translation>
     </message>
     <message>
         <source>Blocksdir</source>
@@ -1966,10 +1942,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>Node window</source>
         <translation>Csomópont ablak</translation>
-    </message>
-    <message>
-        <source>Current block height</source>
-        <translation>Jelenlegi legmagasabb blokkszám</translation>
     </message>
     <message>
         <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
@@ -2564,10 +2536,6 @@ Figyelem: Mivel bájtonként lesz a dj kiszámolva ezért a "100 satoshi per kB"
         <translation>Később növelheti a tranzakció díját (lásd Replace-By-Fee, BIP-125).</translation>
     </message>
     <message>
-        <source>Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can save or copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
-        <translation>Kérlek nézd át a tranzakciós javaslatot. Ez létrehoz egy Részlegesen Aláírt Bitcoin Tranzakciót (PSBT) amit elmenthetsz vagy kimásolhatsz. Aztán aláírhatod: offline %1 tárcával vagy egy PSBT kompatibilis hardver tárcával.</translation>
-    </message>
-    <message>
         <source>Please, review your transaction.</source>
         <translation>Kérjük, hogy ellenőrizze le a tranzakcióját.</translation>
     </message>
@@ -2598,6 +2566,10 @@ Figyelem: Mivel bájtonként lesz a dj kiszámolva ezért a "100 satoshi per kB"
     <message>
         <source>Send</source>
         <translation>Küldés</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT másolva</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>
@@ -3425,7 +3397,7 @@ A Fájl &gt; Megnyitás menüben lehet megnyitni.
     </message>
     <message>
         <source>Do you want to draft a transaction with fee increase?</source>
-        <translation>Akarsz egy piszkozat tranzakciót díj emeléssel?</translation>
+        <translation>Akarod egy piszkozat tranzakciót díj emeléssel?</translation>
     </message>
     <message>
         <source>Current fee:</source>
@@ -3726,6 +3698,10 @@ A Fájl &gt; Megnyitás menüben lehet megnyitni.
         <translation>P2P címek betöltése...</translation>
     </message>
     <message>
+        <source>Error: Disk space is too low!</source>
+        <translation>Hiba: A lemezen kevés hely elérhető!</translation>
+    </message>
+    <message>
         <source>Loading banlist...</source>
         <translation>Tiltólista betöltése...</translation>
     </message>
@@ -3790,32 +3766,12 @@ A Fájl &gt; Megnyitás menüben lehet megnyitni.
         <translation>Napaka: Ni mogoče sprejemati dohodnih povezav (vrnjena napaka: %s)</translation>
     </message>
     <message>
-        <source>%s corrupt. Try using the wallet tool bitcoin-wallet to salvage or restoring a backup.</source>
-        <translation>%s sérült. Megpróbálhatod a bitcoint-wallet tárcaj mentő eszközt, vagy mentésből helyreállítani a tárcát.</translation>
-    </message>
-    <message>
-        <source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use version 169900 or no version specified.</source>
-        <translation>A korábbi (nem HD) tárca nem frissíthető. Először frissíteni kell, hogy támogassa a "pre split keypool"-t. Használd a 169900 verziót vagy olyat amiben egyáltalán nincs verzió megadva.</translation>
-    </message>
-    <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
         <translation>Érvénytelen összeg -maxtxfee=&lt;amount&gt;: '%s' (legalább a minrelay összeg azaz %s kell legyen, hogy ne ragadjon be a tranzakció)</translation>
     </message>
     <message>
         <source>The transaction amount is too small to send after the fee has been deducted</source>
         <translation>A tranzakció összege túl alacsony az elküldéshez miután a díj levonódik</translation>
-    </message>
-    <message>
-        <source>This error could occur if this wallet was not shutdown cleanly and was last loaded using a build with a newer version of Berkeley DB. If so, please use the software that last loaded this wallet</source>
-        <translation>Ez a hiba akkor jelentkezhet ha a tárca nem volt rendesen lezárva és egy újabb verziójában volt megnyitva a Berkeley DB-nek. Ha így van akkor használd azt a verziót amivel legutóbb megnyitottad.</translation>
-    </message>
-    <message>
-        <source>This is the maximum transaction fee you pay (in addition to the normal fee) to prioritize partial spend avoidance over regular coin selection.</source>
-        <translation>Ez a maximum tranzakciós díj amit fizetni fogsz (a normál díj felett), hogy prioritizáld a részleges költés elkerülést a normál coin választás felett.</translation>
-    </message>
-    <message>
-        <source>Transaction needs a change address, but we can't generate it. Please call keypoolrefill first.</source>
-        <translation>A tranzakcióhoz szükség van egy visszajáró címre de nem tudtam létrehozni. Kérem először töltsd újra a címtárat a keypoolrefill paranccsal.</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
@@ -3840,18 +3796,6 @@ A Fájl &gt; Megnyitás menüben lehet megnyitni.
     <message>
         <source>Error upgrading chainstate database</source>
         <translation>Hiba a blokk adatbázis betöltése közben</translation>
-    </message>
-    <message>
-        <source>Error: Disk space is low for %s</source>
-        <translation>Hiba: kevés a hely a lemezen %s -nek!</translation>
-    </message>
-    <message>
-        <source>Error: Keypool ran out, please call keypoolrefill first</source>
-        <translation>A címraktár kiürült, tötsd újra a keyppolrefill paranccsal.</translation>
-    </message>
-    <message>
-        <source>Fee rate (%s) is lower than the minimum fee rate setting (%s)</source>
-        <translation>A választott díj (%s) alacsonyabb mint a beállított minimum díj (%s)</translation>
     </message>
     <message>
         <source>Invalid -onion address or hostname: '%s'</source>
@@ -3908,8 +3852,7 @@ A Fájl &gt; Megnyitás menüben lehet megnyitni.
     <message>
         <source>The specified config file %s does not exist
 </source>
-        <translation>A megadott konfigurációs fájl %s nem található.
-</translation>
+        <translation>A megadott konfigurációs fájl %s nem található.</translation>
     </message>
     <message>
         <source>The transaction amount is too small to pay the fee</source>
@@ -3956,12 +3899,20 @@ A Fájl &gt; Megnyitás menüben lehet megnyitni.
         <translation>-maxtxfee túl magasra van állítva! Ez a jelentős díj esetleg már egy egyszeri tranzakcióra is ki lehet fizetve.</translation>
     </message>
     <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation>-maxtxfee túl magasra van állítva! Ez a jelentős díj esetleg már egy egyszeri tranzakcióra is ki lehet fizetve.</translation>
+    </message>
+    <message>
         <source>This is the transaction fee you may pay when fee estimates are not available.</source>
         <translation>Ezt a tranzakciós díjat fogod fizetni ha a díjbecslés nem lehetséges.</translation>
     </message>
     <message>
         <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
         <translation>A hálózati verzió string (%i) hossza túllépi a megengedettet (%i). Csökkentsd a hosszt vagy a darabszámot uacomments beállításban.</translation>
+    </message>
+    <message>
+        <source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
+        <translation>Figyelem: A tárca-fájl megsérült, de az adatokat sikerült megmenteni! Az eredeti %s fájlt mentettük %s név alatt a %s könyvtárban. Amennyiben az egyenleg vagy a trancakciók helytelenek, állítsa vissza tárcáját a biztonsági mentés használatával.</translation>
     </message>
     <message>
         <source>%s is set very high!</source>
@@ -4006,6 +3957,10 @@ A Fájl &gt; Megnyitás menüben lehet megnyitni.
     <message>
         <source>Insufficient funds</source>
         <translation>Fedezethiány</translation>
+    </message>
+    <message>
+        <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
+        <translation>Díjbecslés sikertelen. Alapértelmezett díj le van tiltva. Fárj néhány blokkot vagy engedélyezd a -fallbackfee -t.</translation>
     </message>
     <message>
         <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>

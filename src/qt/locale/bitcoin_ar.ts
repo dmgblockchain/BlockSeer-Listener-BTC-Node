@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>أنقر بزر الماوس الأيمن لتحرير العنوان أو التصنيف</translation>
+        <translation>أنقر بزر الفأرة الأيمن لتحرير العنوان أو التصنيف</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -476,22 +476,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>محدث</translation>
     </message>
     <message>
-        <source>&amp;Load PSBT from file...</source>
-        <translation>&amp; تحميل PSBT من ملف ...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction</source>
-        <translation>تحميل معاملة بتكوين الموقعة جزئيًا</translation>
-    </message>
-    <message>
-        <source>Load PSBT from clipboard...</source>
-        <translation>تحميل PSBT من الحافظة ...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
-        <translation>تحميل معاملة بتكوين الموقعة جزئيًا من الحافظة</translation>
-    </message>
-    <message>
         <source>Node window</source>
         <translation>نافذة Node </translation>
     </message>
@@ -820,7 +804,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <name>CreateWalletActivity</name>
     <message>
         <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
-        <translation>جاري إنشاء المحفظة&lt;b&gt;%1&lt;/b&gt;.......</translation>
+        <translation>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</translation>
     </message>
     <message>
         <source>Create wallet failed</source>
@@ -851,7 +835,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
-        <translation>تعطيل المفاتيح الخاصة لهذه المحفظة. لن تحتوي المحافظ ذات المفاتيح الخاصة المعطلة على مفاتيح خاصة ولا يمكن أن تحتوي على مفتاح HD أو مفاتيح خاصة مستوردة. هذا مثالي لمحافظ مشاهدة فقط فقط.</translation>
+        <translation>تعطيل المفاتيح الخاصة لهذه المحفظة. لن تحتوي المحافظ ذات المفاتيح الخاصة المعطلة على مفاتيح خاصة ولا يمكن أن تحتوي على مفتاح HD أو مفاتيح خاصة مستوردة. هذا مثالي لمحافظ watch-only فقط.</translation>
     </message>
     <message>
         <source>Disable Private Keys</source>
@@ -864,14 +848,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>Make Blank Wallet</source>
         <translation>أنشئ محفظة فارغة</translation>
-    </message>
-    <message>
-        <source>Use descriptors for scriptPubKey management</source>
-        <translation>استخدم الواصفات لإدارة scriptPubKey</translation>
-    </message>
-    <message>
-        <source>Descriptor Wallet</source>
-        <translation>المحفظة الوصفية</translation>
     </message>
     <message>
         <source>Create</source>
@@ -991,7 +967,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
-        <translation>تتطلب العودة إلى هذا الإعداد إعادة تنزيل سلسلة الكتل بالكامل. من الأسرع تنزيل السلسلة الكاملة أولاً وتقليمها لاحقًا. تعطيل بعض الميزات المتقدمة.</translation>
+        <translation>تتطلب العودة إلى هذا الإعداد إعادة تنزيل blockchain بالكامل. من الأسرع تنزيل السلسلة الكاملة أولاً وتقليمها لاحقًا. تعطيل بعض الميزات المتقدمة.</translation>
     </message>
     <message>
         <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
@@ -1108,7 +1084,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <name>OpenWalletActivity</name>
     <message>
         <source>Open wallet failed</source>
-        <translation>فشل فتح محفظة</translation>
+        <translation>فشل فتح المحفظة</translation>
     </message>
     <message>
         <source>Open wallet warning</source>
@@ -1158,6 +1134,10 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>إظهار ما إذا كان وكيل SOCKS5 الافتراضي الموفر تم استخدامه للوصول إلى النظراء عبر نوع الشبكة هذا.</translation>
     </message>
     <message>
+        <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
+        <translation>إظهار ما إذا كان وكيل SOCKS5 الافتراضي الموفر تم استخدامه للوصول إلى النظراء عبر نوع الشبكة هذا.</translation>
+    </message>
+    <message>
         <source>Hide the icon from the system tray.</source>
         <translation>إخفاء الآيقونة من صينية النظام.</translation>
     </message>
@@ -1195,7 +1175,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Prune &amp;block storage to</source>
-        <translation>تقليم وحظر التخزين لـ</translation>
+        <translation>تقليم وحظر التخزين من أجل</translation>
     </message>
     <message>
         <source>GB</source>

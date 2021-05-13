@@ -6,7 +6,6 @@
 
 Verify that a bitcoind node can load multiple wallet files
 """
-from decimal import Decimal
 from threading import Thread
 import os
 import shutil
@@ -28,6 +27,20 @@ got_loading_error = False
 def test_load_unload(node, name):
     global got_loading_error
     while True:
+        if got_loading_error:
+            return
+        try:
+            node.loadwallet(name)
+            node.unloadwallet(name)
+        except JSONRPCException as e:
+            if e.error['code'] == -4 and 'Wallet already being loading' in e.error['message']:
+                got_loading_error = True
+                return
+
+got_loading_error = False
+def test_load_unload(node, name):
+    global got_loading_error
+    for i in range(10):
         if got_loading_error:
             return
         try:
@@ -280,7 +293,7 @@ class MultiWalletTest(BitcoinTestFramework):
         threads = []
         for _ in range(3):
             n = node.cli if self.options.usecli else get_rpc_proxy(node.url, 1, timeout=600, coveragedir=node.coverage_dir)
-            t = Thread(target=test_load_unload, args=(n, wallet_names[2]))
+            t = Thread(target=test_load_unload, args=(n, wallet_names[2], ))
             t.start()
             threads.append(t)
         for t in threads:

@@ -177,7 +177,6 @@ BASE_SCRIPTS = [
     'wallet_disable.py',
     'wallet_disable.py --descriptors',
     'p2p_addr_relay.py',
-    'p2p_getaddr_caching.py',
     'p2p_getdata.py',
     'rpc_net.py',
     'wallet_keypool.py',

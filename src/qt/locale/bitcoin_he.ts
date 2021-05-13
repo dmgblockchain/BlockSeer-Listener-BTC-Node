@@ -143,7 +143,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Encrypt wallet</source>
-        <translation>הצפנת ארנק</translation>
+        <translation>הצפן ארנק</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to unlock the wallet.</source>
@@ -200,11 +200,11 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Your wallet is about to be encrypted. </source>
-        <translation>הארנק שלך עומד להיות מוצפן.</translation>
+        <translation>הארנק שלך עומד להיות מוצפן/</translation>
     </message>
     <message>
         <source>Your wallet is now encrypted. </source>
-        <translation>הארנק שלך מוצפן כעת.</translation>
+        <translation>הארנק שלך מוצפן כעת/</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
@@ -335,6 +335,14 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>Create a new wallet</source>
         <translation>יצירת ארנק חדש</translation>
+    </message>
+    <message>
+        <source>Create Wallet...</source>
+        <translation>צור ארנק...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>צור ארנק חדש</translation>
     </message>
     <message>
         <source>Wallet:</source>
@@ -483,22 +491,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>Up to date</source>
         <translation>עדכני</translation>
-    </message>
-    <message>
-        <source>&amp;Load PSBT from file...</source>
-        <translation>&amp;העלה PSBT מקובץ...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction</source>
-        <translation>העלה עיסקת ביטקוין חתומה חלקית</translation>
-    </message>
-    <message>
-        <source>Load PSBT from clipboard...</source>
-        <translation>טעינת PSBT מלוח הגזירים...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
-        <translation>טעינת עסקת ביטקוין חתומה חלקית מלוח הגזירים</translation>
     </message>
     <message>
         <source>Node window</source>
@@ -836,7 +828,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <name>CreateWalletDialog</name>
     <message>
         <source>Create Wallet</source>
-        <translation>יצירת ארנק</translation>
+        <translation>צור ארנק.</translation>
     </message>
     <message>
         <source>Wallet Name</source>
@@ -867,16 +859,8 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>צור ארנק ריק</translation>
     </message>
     <message>
-        <source>Use descriptors for scriptPubKey management</source>
-        <translation>השתמש ב descriptors לניהול scriptPubKey </translation>
-    </message>
-    <message>
-        <source>Descriptor Wallet</source>
-        <translation>ארנק Descriptor </translation>
-    </message>
-    <message>
         <source>Create</source>
-        <translation>יצירה</translation>
+        <translation>צור</translation>
     </message>
 </context>
 <context>
@@ -992,7 +976,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Reverting this setting requires re-downloading the entire blockchain. It is faster to download the full chain first and prune it later. Disables some advanced features.</source>
-        <translation>חזרה לאחור מהגדרות אלו מחייב הורדה מחדש של כל שרשרת הבלוקים. מהיר יותר להוריד את השרשרת המלאה ולקטום אותה מאוחר יותר. הדבר מנטרל כמה תכונות מתקדמות.</translation>
+        <translation>חזרה לאחור מהגדרות אלו מחייב הורדה מחדש של כל הבלוקצ'יין. מהיר יותר להוריד את השרשרת המלאה ולקטום אותה מאוחר יותר. הדבר מנטרל כמה תכונות מתקדמות.</translation>
     </message>
     <message>
         <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
@@ -1964,10 +1948,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>חלון צומת</translation>
     </message>
     <message>
-        <source>Current block height</source>
-        <translation>גובה הבלוק הנוכחי</translation>
-    </message>
-    <message>
         <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
         <translation>פתיחת יומן ניפוי הבאגים %1 מתיקיית הנתונים הנוכחית. עבור קובצי יומן גדולים ייתכן זמן המתנה של מספר שניות.</translation>
     </message>
@@ -2509,7 +2489,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Cr&amp;eate Unsigned</source>
-        <translation>י&amp;צירת לא חתומה</translation>
+        <translation>יצ&amp;ירת לא חתום</translation>
     </message>
     <message>
         <source>Creates a Partially Signed Bitcoin Transaction (PSBT) for use with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
@@ -2592,8 +2572,16 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>אישור הצעת עיסקה</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>העתקת PSBT אל לוח הגזירים</translation>
+    </message>
+    <message>
         <source>Send</source>
-        <translation>שליחה</translation>
+        <translation>שלח</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT הועתקה</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>
@@ -3371,7 +3359,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
-        <translation>האם אכן ברצונך לסגור את הארנק &lt;i&gt;%1&lt;/i&gt;?</translation>
+        <translation>האם את/ה בטוח/ה שברצונך לסגור את הארנק &lt;i&gt;%1&lt;/i&gt;?</translation>
     </message>
     <message>
         <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
@@ -3626,6 +3614,14 @@ Go to File &gt; Open Wallet to load a wallet.
         <translation> קובץ asmap %s לא נפרס</translation>
     </message>
     <message>
+        <source>Could not find asmap file %s</source>
+        <translation>  קובץ asmap %s לא נמצא</translation>
+    </message>
+    <message>
+        <source>Could not parse asmap file %s</source>
+        <translation> קובץ asmap %s לא נפרס</translation>
+    </message>
+    <message>
         <source>Do you want to rebuild the block database now?</source>
         <translation>האם לבנות מחדש את מסד נתוני המקטעים?</translation>
     </message>
@@ -3870,6 +3866,10 @@ Go to File &gt; Open Wallet to load a wallet.
         <translation>מצב מצומצם לא ניתן לשימוש עם blockfilterindex</translation>
     </message>
     <message>
+        <source>Prune mode is incompatible with -blockfilterindex.</source>
+        <translation>מצב מצומצם לא ניתן לשימוש עם blockfilterindex</translation>
+    </message>
+    <message>
         <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
         <translation>הורדת -maxconnections מ %d ל %d, עקב מגבלות מערכת.</translation>
     </message>
@@ -3926,6 +3926,10 @@ Go to File &gt; Open Wallet to load a wallet.
     <message>
         <source>Unable to generate initial keys</source>
         <translation>לא ניתן ליצור מפתחות ראשוניים</translation>
+    </message>
+    <message>
+        <source>Unknown -blockfilterindex value %s.</source>
+        <translation>ערך -blockfilterindex   %s לא ידוע.</translation>
     </message>
     <message>
         <source>Unknown -blockfilterindex value %s.</source>

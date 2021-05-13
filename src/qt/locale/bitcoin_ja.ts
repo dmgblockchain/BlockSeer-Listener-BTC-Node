@@ -70,6 +70,10 @@
         <translation>これらは、あなたが知っている送信先の Bitcoin アドレスです。コインを送る前に必ず、金額と受取用アドレスを確認してください。</translation>
     </message>
     <message>
+        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
+        <translation>これらは支払いを受け取るための、あなたの Bitcoin アドレスです。新しいアドレスを作成するには受取タブ内の「新しい受取用アドレスを作成」ボタンを使用します。</translation>
+    </message>
+    <message>
         <source>&amp;Copy Address</source>
         <translation>アドレスをコピー(&amp;C)</translation>
     </message>
@@ -477,14 +481,6 @@
     <message>
         <source>Up to date</source>
         <translation>ブロックは最新</translation>
-    </message>
-    <message>
-        <source>Load PSBT from clipboard...</source>
-        <translation>PSBTをクリップボードから読み込み</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
-        <translation>部分的に署名されたビットコインのトランザクションをクリップボードから読み込み</translation>
     </message>
     <message>
         <source>Node window</source>
@@ -2397,8 +2393,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>送金してもよろしいですか？</translation>
     </message>
     <message>
-        <source>Save Transaction Data</source>
-        <translation>トランザクションデータの保存</translation>
+        <source>Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>トランザクション提案を確認してください。これにより、部分的に署名されたビットコイン・トランザクション（PSBT）が作成されます。これをコピーして例えばオフラインの %1 ウォレットやPSBTを扱えるハードウェアウォレットで残りの署名が出来ます。</translation>
     </message>
     <message>
         <source>or</source>
@@ -2437,8 +2433,16 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>トランザクション提案を承認する</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>PSBTをクリップボードにコピー</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>送金</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBTがコピーされました</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>

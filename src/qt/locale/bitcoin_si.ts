@@ -42,6 +42,10 @@
         <translation>කාසි ලැබිය යුතු ලිපිනය තෝරන්න</translation>
     </message>
     <message>
+        <source>C&amp;hoose</source>
+        <translation>තෝරන්න</translation>
+    </message>
+    <message>
         <source>Sending addresses</source>
         <translation>යවන ලිපින</translation>
     </message>
@@ -52,6 +56,10 @@
     <message>
         <source>These are your Bitcoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
         <translation>මේවා ඔබගේ ගෙවීම් යැවීම සඳහා වන බිට්කොයින් ලිපින වේ. කාසි යැවීමට පෙර සෑම විටම මුදල සහ ලැබීමේ ලිපිනය පරීක්ෂා කරන්න.</translation>
+    </message>
+    <message>
+        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
+        <translation> මේවා ඔබගේ ගෙවීම් ලැබීම සඳහා වන බිට්කොයින් ලිපින වේ. නව ලිපින සෑදීම සඳහා ලැබීම් ටැබ් එකෙහි ඇති 'නව ලැබීමේ ලිපිනයක් සාදන්න' බොත්තම භාවිතා කරන්න.</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
@@ -209,6 +217,10 @@
     </context>
 <context>
     <name>BitcoinGUI</name>
+    <message>
+        <source>Synchronizing with network...</source>
+        <translation>ජාලය සමග සමමුහුර්ත වෙමින්...</translation>
+    </message>
     <message>
         <source>Browse transaction history</source>
         <translation>ගනුදෙනු ඉතිහාසය පිරික්සන්න</translation>

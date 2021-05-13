@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Högerklicka för att redigera adressen eller etiketten.</translation>
+        <translation>Högerklicka för att redigera adress eller etikett.</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -2325,6 +2325,10 @@ Notera: Då avgiften beräknas per byte kommer en avgift på 50 satoshi tas ut f
         <translation>Är du säker på att du vill skicka?</translation>
     </message>
     <message>
+        <source>Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>Pleasetransaktion, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</translation>
+    </message>
+    <message>
         <source>or</source>
         <translation>eller</translation>
     </message>
@@ -2361,8 +2365,16 @@ Notera: Då avgiften beräknas per byte kommer en avgift på 50 satoshi tas ut f
         <translation>Bekräfta transaktionsförslag</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Kopiera PSBT till urklipp</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Skicka</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT kopierad</translation>
     </message>
     <message>
         <source>The recipient address is not valid. Please recheck.</source>

@@ -301,15 +301,10 @@ void InterruptRPC()
 
 void StopRPC()
 {
-    static std::once_flag g_rpc_stop_flag;
-    // This function could be called twice if the GUI has been started with -server=1.
-    assert(!g_rpc_running);
-    std::call_once(g_rpc_stop_flag, []() {
-        LogPrint(BCLog::RPC, "Stopping RPC\n");
-        WITH_LOCK(g_deadline_timers_mutex, deadlineTimers.clear());
-        DeleteAuthCookie();
-        g_rpcSignals.Stopped();
-    });
+    LogPrint(BCLog::RPC, "Stopping RPC\n");
+    WITH_LOCK(g_deadline_timers_mutex, deadlineTimers.clear());
+    DeleteAuthCookie();
+    g_rpcSignals.Stopped();
 }
 
 bool IsRPCRunning()

@@ -70,10 +70,8 @@
         <translation>Aquestes són les vostres adreces de Bitcoin per enviar els pagaments. Sempre reviseu l'import i l'adreça del destinatari abans de transferir monedes.</translation>
     </message>
     <message>
-        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.
-Signing is only possible with addresses of the type 'legacy'.</source>
-        <translation>Aquestes son les teves adreces de Bitcoin per rebre pagaments. Utilitza el botó "Crear nova adreça de recepció" de la pestanya de recepció per crear una nova adreça.
-Només és possible firmar amb adreces del tipus "legacy".</translation>
+        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
+        <translation>Aquestes són les teves adreces Bitcoin per rebre pagaments. Utilitza el botó "Crear nova adreça de recepció" de la pestanya de recepció per crear noves adreces.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -484,22 +482,6 @@ Només és possible firmar amb adreces del tipus "legacy".</translation>
         <translation>Actualitzat</translation>
     </message>
     <message>
-        <source>&amp;Load PSBT from file...</source>
-        <translation>&amp;Carrega el PSBT des del fitxer ...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction</source>
-        <translation>Carrega la transacció Bitcoin signada parcialment</translation>
-    </message>
-    <message>
-        <source>Load PSBT from clipboard...</source>
-        <translation>Carrega PSBT des del porta-retalls ...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
-        <translation>Carrega la transacció de Bitcoin signada parcialment des del porta-retalls</translation>
-    </message>
-    <message>
         <source>Node window</source>
         <translation>Finestra node</translation>
     </message>
@@ -872,14 +854,6 @@ Això és ideal per a carteres de mode només lectura.</translation>
     <message>
         <source>Make Blank Wallet</source>
         <translation>Fes cartera en blanc</translation>
-    </message>
-    <message>
-        <source>Use descriptors for scriptPubKey management</source>
-        <translation>Utilitzeu descriptors per a la gestió de scriptPubKey</translation>
-    </message>
-    <message>
-        <source>Descriptor Wallet</source>
-        <translation>Cartera del descriptor</translation>
     </message>
     <message>
         <source>Create</source>
@@ -2427,6 +2401,10 @@ Nota: Com que la comissió es calcula en funció dels bytes, una comissió de "1
         <translation>Esteu segur que ho voleu enviar?</translation>
     </message>
     <message>
+        <source>Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>Revisa la teva proposta de transacció. Es produirà una transacció de Bitcoin amb signatura parcial (PSBT) que podeu copiar i després signar, per exemple, amb una cartera %1 de tipus fora de línia o una cartera física compatible amb PSBT.</translation>
+    </message>
+    <message>
         <source>or</source>
         <translation>o</translation>
     </message>
@@ -2463,8 +2441,16 @@ Nota: Com que la comissió es calcula en funció dels bytes, una comissió de "1
         <translation>Confirmeu la proposta de transacció</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Copiar PSBT al porta-retalls.</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Enviar</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT copiada</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>
@@ -3248,11 +3234,7 @@ Nota: Com que la comissió es calcula en funció dels bytes, una comissió de "1
         <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
         <translation>Si tanqueu la cartera durant massa temps, es pot haver de tornar a sincronitzar tota la cadena si teniu el sistema de poda habilitat.</translation>
     </message>
-    <message>
-        <source>Close all wallets</source>
-        <translation>Tanqueu totes les carteres</translation>
-    </message>
-    </context>
+</context>
 <context>
     <name>WalletFrame</name>
     <message>
@@ -3387,6 +3369,10 @@ Nota: Com que la comissió es calcula en funció dels bytes, una comissió de "1
     <message>
         <source>The %s developers</source>
         <translation>Els desenvolupadors %s</translation>
+    </message>
+    <message>
+        <source>Can't generate a change-address key. No keys in the internal keypool and can't generate any keys.</source>
+        <translation>No es pot generar una clau d’adreça de canvi. No hi ha claus al keypool intern i no es pot generar cap clau.</translation>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
@@ -3559,6 +3545,10 @@ Nota: Com que la comissió es calcula en funció dels bytes, una comissió de "1
     <message>
         <source>Loading P2P addresses...</source>
         <translation>S'estan carregant les adreces P2P ...</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is too low!</source>
+        <translation>Error: l'espai del disc és insuficient.</translation>
     </message>
     <message>
         <source>Loading banlist...</source>
@@ -3797,6 +3787,10 @@ Nota: Com que la comissió es calcula en funció dels bytes, una comissió de "1
     <message>
         <source>Insufficient funds</source>
         <translation>Balanç insuficient</translation>
+    </message>
+    <message>
+        <source>Cannot upgrade a non HD split wallet without upgrading to support pre split keypool. Please use -upgradewallet=169900 or -upgradewallet with no version specified.</source>
+        <translation>No es pot actualitzar una cartera de tipus dividida que no sigui física sense haver d'actualitzar per tal de suportar keypool pre dividida. Si us plau, utilitzeu -upgradewallet = 169900 o -upgradewallet sense cap versió especificada.</translation>
     </message>
     <message>
         <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>

@@ -1963,7 +1963,7 @@ Signing is only possible with addresses of the type 'legacy'.</translation>
     </message>
     <message>
         <source>Mapped AS</source>
-        <translation>Mapped AS</translation>
+        <translation>Mapeado como</translation>
     </message>
     <message>
         <source>User Agent</source>

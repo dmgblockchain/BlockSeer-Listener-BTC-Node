@@ -123,7 +123,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <name>AskPassphraseDialog</name>
     <message>
         <source>Passphrase Dialog</source>
-        <translation>密码对话框</translation>
+        <translation>密码输入框</translation>
     </message>
     <message>
         <source>Enter passphrase</source>

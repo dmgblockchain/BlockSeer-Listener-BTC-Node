@@ -10,7 +10,6 @@
 #include <string>
 #include <sys/file.h>
 #include <sys/utsname.h>
-#include <unistd.h>
 #else
 #ifndef NOMINMAX
 #define NOMINMAX

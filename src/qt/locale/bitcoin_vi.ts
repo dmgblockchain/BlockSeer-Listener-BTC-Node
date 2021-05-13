@@ -2372,8 +2372,16 @@ Lưu ý: Vì phí được tính trên cơ sở mỗi byte, nên phí "100 satos
         <translation>Xác nhận đề xuất giao dịch</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Sao chép PSBT vào khay nhớ tạp clipboard</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Gửi</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>Đã sao chép PSBT</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>

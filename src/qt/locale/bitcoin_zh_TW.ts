@@ -331,6 +331,14 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>產生一個新錢包</translation>
     </message>
     <message>
+        <source>Create Wallet...</source>
+        <translation>新增錢包...</translation>
+    </message>
+    <message>
+        <source>Create a new wallet</source>
+        <translation>創建一個新錢包</translation>
+    </message>
+    <message>
         <source>Wallet:</source>
         <translation>錢包:</translation>
     </message>
@@ -479,22 +487,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>最新狀態</translation>
     </message>
     <message>
-        <source>&amp;Load PSBT from file...</source>
-        <translation>從檔案中載入PSBT ...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction</source>
-        <translation>載入部分簽名的比特幣交易</translation>
-    </message>
-    <message>
-        <source>Load PSBT from clipboard...</source>
-        <translation>從剪貼簿載入PSBT ...</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
-        <translation>從剪貼簿載入部分簽名的比特幣交易</translation>
-    </message>
-    <message>
         <source>Node window</source>
         <translation>節點視窗</translation>
     </message>
@@ -509,6 +501,10 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <message>
         <source>&amp;Receiving addresses</source>
         <translation>&amp;接收地址</translation>
+    </message>
+    <message>
+        <source>Open a bitcoin: URI</source>
+        <translation>打開一個比特幣：URI</translation>
     </message>
     <message>
         <source>Open a bitcoin: URI</source>
@@ -845,7 +841,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
-        <translation>禁用此錢包的私鑰。取消了私鑰的錢包將沒有私鑰，並且不能有HD種子或匯入的私鑰。這是只能看的錢包的理想選擇。</translation>
+        <translation>禁用此錢包的私鑰。禁用了私鑰的錢包將沒有私鑰，並且不能有HD種子或匯入的私鑰。這是只能看的錢包的理想選擇。</translation>
     </message>
     <message>
         <source>Disable Private Keys</source>
@@ -853,19 +849,11 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
-        <translation>製作一個空白的錢包。空白錢包最初沒有私鑰或腳本。以後可以匯入私鑰和地址，或者可以設定HD種子。</translation>
+        <translation>製作一個空白的錢包。空白錢包最初沒有私鑰或腳本。以後可以導入私鑰和地址，或者可以設定HD種子。</translation>
     </message>
     <message>
         <source>Make Blank Wallet</source>
         <translation>製作空白錢包</translation>
-    </message>
-    <message>
-        <source>Use descriptors for scriptPubKey management</source>
-        <translation>使用descriptors(描述符)進行scriptPubKey管理</translation>
-    </message>
-    <message>
-        <source>Descriptor Wallet</source>
-        <translation>描述符錢包</translation>
     </message>
     <message>
         <source>Create</source>
@@ -1037,7 +1025,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message numerus="yes">
         <source>(%n GB needed for full chain)</source>
-        <translation><numerusform>（完整鏈需要％n GB）</numerusform></translation>
+        <translation><numerusform>（完整區塊鏈需要％n GB）</numerusform></translation>
     </message>
 </context>
 <context>
@@ -1099,7 +1087,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     <name>OpenURIDialog</name>
     <message>
         <source>Open bitcoin URI</source>
-        <translation>打開比特幣URI</translation>
+        <translation>打開比特幣 URI</translation>
     </message>
     <message>
         <source>URI:</source>
@@ -1594,11 +1582,11 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>Cannot process payment request because BIP70 is not supported.</source>
-        <translation>由於不支援BIP70，因此無法處理付款要求。</translation>
+        <translation>由於不支援BIP70，因此無法處理付款請求。</translation>
     </message>
     <message>
         <source>Due to widespread security flaws in BIP70 it's strongly recommended that any merchant instructions to switch wallets be ignored.</source>
-        <translation>由於BIP70中存在廣泛的安全性漏洞，因此強烈建議您忽略任何商戶更換錢包的指示都將被忽略。</translation>
+        <translation>由於BIP70中存在廣泛的安全漏洞，因此強烈建議您忽略任何商戶更換錢包的指示都將被忽略。</translation>
     </message>
     <message>
         <source>If you are receiving this error you should request the merchant provide a BIP21 compatible URI.</source>
@@ -1917,10 +1905,6 @@ Signing is only possible with addresses of the type 'legacy'.</source>
         <translation>節點視窗</translation>
     </message>
     <message>
-        <source>Current block height</source>
-        <translation>當前區塊高度</translation>
-    </message>
-    <message>
         <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
         <translation>從目前的資料目錄下開啓 %1 的除錯紀錄檔。當紀錄檔很大時，可能會花好幾秒的時間。</translation>
     </message>
@@ -2125,7 +2109,7 @@ Signing is only possible with addresses of the type 'legacy'.</source>
     </message>
     <message>
         <source>An optional label to associate with the new receiving address (used by you to identify an invoice).  It is also attached to the payment request.</source>
-        <translation>與新的接收地址相關聯的可選的標籤（您用於標識收據）。它也附在支付支付請求上。</translation>
+        <translation>與新的接收地址相關聯的可選標籤（您用於標識收據）。它也附在支付支付請求上。</translation>
     </message>
     <message>
         <source>An optional message that is attached to the payment request and may be displayed to the sender.</source>
@@ -2386,7 +2370,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Hide transaction fee settings</source>
-        <translation>隱藏交易手續費設定</translation>
+        <translation>隱藏交易費用設定</translation>
     </message>
     <message>
         <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for bitcoin transactions than the network can process.</source>
@@ -2533,8 +2517,16 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>確認交易建議</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>將PSBT複製到剪貼簿</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>發</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT已復制</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>
@@ -2764,6 +2756,14 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     <message>
         <source>The Bitcoin address the message was signed with</source>
         <translation>簽名這個訊息的 比特幣地址</translation>
+    </message>
+    <message>
+        <source>The signed message to verify</source>
+        <translation>簽名訊息進行驗證</translation>
+    </message>
+    <message>
+        <source>The signature given when the message was signed</source>
+        <translation>簽名訊息時給出的簽名</translation>
     </message>
     <message>
         <source>The signed message to verify</source>
@@ -3358,7 +3358,7 @@ Go to File &gt; Open Wallet to load a wallet.
     </message>
     <message>
         <source>Do you want to draft a transaction with fee increase?</source>
-        <translation>您想通過增加手續費草擬交易嗎？</translation>
+        <translation>您想通過增加手續費起草交易嗎？</translation>
     </message>
     <message>
         <source>Current fee:</source>

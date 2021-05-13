@@ -74,6 +74,7 @@ jobs:
       env: >-
         FILE_ENV="./ci/test/00_setup_env_arm.sh"
         QEMU_USER_CMD=""
+
 # s390 build was disabled temporarily because of disk space issues on the Travis VM
 #
 #    - stage: test
@@ -101,16 +102,19 @@ jobs:
       env: >-
         TEST_RUNNER_EXTRA="--exclude feature_block"
         FILE_ENV="./ci/test/00_setup_env_native_tsan.sh"
+        TEST_RUNNER_EXTRA="--exclude feature_block"  # Not enough memory on travis machines
+
+    - stage: test
+      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [no depends, only system libs, sanitizers: address/leak (ASan + LSan) + undefined (UBSan) + integer]'
+      env: >-
+        FILE_ENV="./ci/test/00_setup_env_native_asan.sh"
+
     - stage: test
       name: 'x86_64 Linux  [GOAL: install]  [focal]  [no depends, only system libs, sanitizers: fuzzer,address,undefined]'
       env: >-
         FILE_ENV="./ci/test/00_setup_env_native_fuzz.sh"
     - stage: test
-      name: 'x86_64 Linux [GOAL: install]  [focal]  [multiprocess]'
-      env: >-
-        FILE_ENV="./ci/test/00_setup_env_native_multiprocess.sh"
-    - stage: test
-      name: 'x86_64 Linux  [GOAL: install]  [xenial]  [no wallet]'
+      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [no wallet]'
       env: >-
         FILE_ENV="./ci/test/00_setup_env_native_nowallet.sh"
     - stage: test

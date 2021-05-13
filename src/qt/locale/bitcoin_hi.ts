@@ -3,11 +3,11 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>पता व नामपत्र बदलने के लिए दायीं कुंजी दबाइए </translation>
+        <translation>पता या लेबल को बदलने के लिए राइट-क्लिक करें </translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>नया एड्रेस बनाएं</translation>
+        <translation>नया पता बनाएं</translation>
     </message>
     <message>
         <source>&amp;New</source>
@@ -15,7 +15,7 @@
     </message>
     <message>
         <source>Copy the currently selected address to the system clipboard</source>
-        <translation>चुने हुए एड्रेस को सिस्टम क्लिपबोर्ड पर कॉपी करें</translation>
+        <translation>चुने हुए पता को सिस्टम क्लिपबोर्ड पर कॉपी करें</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
@@ -27,11 +27,11 @@
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>चुने हुए एड्रेस को सूची से हटाएं</translation>
+        <translation>चुने हुए पता को सूची से हटाएं</translation>
     </message>
     <message>
         <source>Enter address or label to search</source>
-        <translation>ढूंढने के लिए एड्रेस या लेबल दर्ज करें</translation>
+        <translation>ढूंढने के लिए पता या लेबल दर्ज करें</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
@@ -59,19 +59,23 @@
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>एड्रेस भेजे जा रहें हैं</translation>
+        <translation>पता भेजे जा रहें हैं</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
-        <translation>एड्रेस प्राप्त किए जा रहें हैं</translation>
+        <translation>पता प्राप्त किए जा रहें हैं</translation>
     </message>
     <message>
         <source>These are your Bitcoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>भुगतान करने के लिए ये आपके बिटकॉइन एड्रेस हैं। कॉइन भेजने से पहले राशि और गंतव्य एड्रेस की हमेशा जाँच करें </translation>
+        <translation>भुगतान करने के लिए ये आपके बिटकॉइन पता हैं। कॉइन भेजने से पहले राशि और गंतव्य पता की हमेशा जाँच करें </translation>
+    </message>
+    <message>
+        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
+        <translation>भुगतान प्राप्त करने के लिए ये आपके बिटकॉइन पता हैं। नया पता बनाने के लिए रिसीव टैब में 'नया पता बनाएं' बटन का प्रयोग करें</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
-        <translation>&amp;एड्रेस कॉपी करें</translation>
+        <translation>&amp;पता कॉपी करें</translation>
     </message>
     <message>
         <source>Copy &amp;Label</source>
@@ -83,7 +87,7 @@
     </message>
     <message>
         <source>Export Address List</source>
-        <translation>एड्रेस की सूची निर्यात करें</translation>
+        <translation>पता की सूची निर्यात करें</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
@@ -373,10 +377,6 @@
     <message>
         <source>Close wallet</source>
         <translation>बटुआ बंद करें</translation>
-    </message>
-    <message>
-        <source>Close All Wallets...</source>
-        <translation>सारे बटुएँ बंद करें...</translation>
     </message>
     <message>
         <source>Sent transaction</source>

@@ -177,7 +177,7 @@
     </message>
     <message>
         <source>Your wallet is about to be encrypted. </source>
-        <translation>Portofoli juaj do të enkriptohet</translation>
+        <translation>Portofoli juaj do të enkriptohet.</translation>
     </message>
     <message>
         <source>Your wallet is now encrypted. </source>

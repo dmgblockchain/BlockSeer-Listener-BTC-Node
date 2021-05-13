@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>ایجاد یک آدرس جدید</translation>
+        <translation>یک آدرس جدید ایجاد کنید</translation>
     </message>
     <message>
         <source>&amp;New</source>
@@ -15,7 +15,7 @@
     </message>
     <message>
         <source>Copy the currently selected address to the system clipboard</source>
-        <translation>کپی کردن آدرس  انتخاب شده به حافظه  کلیپ بورد سیستم</translation>
+        <translation>آدرس فعلی انتخواب شده را در کیبورد سیستم  خود کپی کنید</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>صدور داده نوار جاری به یک فایل</translation>
+        <translation>اطلاعات موجود در صفحه را به یک فایل انقال دهید</translation>
     </message>
     <message>
         <source>&amp;Export</source>
@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>آدرس برای ارسال کوین‌ها را انتخاب کنید</translation>
+        <translation>آدرس را برای واریز کوین انتخواب کنید</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
@@ -68,6 +68,10 @@
     <message>
         <source>These are your Bitcoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
         <translation>اینها آدرس‌های شما برای ارسال وجوه هستند. همیشه قبل از ارسال، مقدار و آدرس گیرنده را بررسی کنید.</translation>
+    </message>
+    <message>
+        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
+        <translation>اینها آدرس بیت کوین های دریافتی شما می باشدند. در تب دریافت از دکمه 'ایحاد آدرس جدید' برای ساخت آدرس جدید استفاده نمائید.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -312,7 +316,7 @@
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
-        <translation>تهیه نسخه پشتیبان از کیف پول</translation>
+        <translation>&amp;پیشتیبان‌گیری از کیف پول...</translation>
     </message>
     <message>
         <source>&amp;Change Passphrase...</source>
@@ -513,14 +517,6 @@
     <message>
         <source>Close wallet</source>
         <translation>کیف پول را ببندید</translation>
-    </message>
-    <message>
-        <source>Close All Wallets...</source>
-        <translation>همه‌ی کیف پول‌ها را ببند...</translation>
-    </message>
-    <message>
-        <source>Close all wallets</source>
-        <translation>همه‌ی کیف پول‌ها را ببند</translation>
     </message>
     <message>
         <source>default wallet</source>
@@ -1650,10 +1646,6 @@
         <translation>پنجره گره</translation>
     </message>
     <message>
-        <source>Current block height</source>
-        <translation>ارتفاع فعلی بلوک</translation>
-    </message>
-    <message>
         <source>Decrease font size</source>
         <translation>کاهش دادن اندازه فونت</translation>
     </message>
@@ -2120,6 +2112,10 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     <message>
         <source>Send</source>
         <translation>ارسال</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT کپی شد</translation>
     </message>
     <message>
         <source>The recipient address is not valid. Please recheck.</source>
@@ -2772,10 +2768,6 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
         <translation>آیا برای بستن کیف پول مطمئن هستید&lt;i&gt; %1 &lt;/i&gt; ؟</translation>
     </message>
-    <message>
-        <source>Close all wallets</source>
-        <translation>همه‌ی کیف پول‌ها را ببند</translation>
-    </message>
     </context>
 <context>
     <name>WalletFrame</name>
@@ -3013,13 +3005,16 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>این کمترین فی تراکنش است که در هر تراکنش پرداخت می‌نمایید.</translation>
     </message>
     <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation>این میزان کارمزد پرداختی شما در صورت ایجاد تراکنش انتقال میباشد.</translation>
+    </message>
+    <message>
         <source>Transaction amounts must not be negative</source>
         <translation>مقدار تراکنش نمی‌تواند منفی باشد.</translation>
     </message>
     <message>
         <source>Transaction has too long of a mempool chain</source>
-        <translation>تراکنش بیش از حد طولانی از یک زنجیر مهر و موم شده است
-</translation>
+        <translation>طول زنجیره تراکنش بیش از حد مجاز میباشد</translation>
     </message>
     <message>
         <source>Transaction must have at least one recipient</source>
@@ -3043,15 +3038,15 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Loading block index...</source>
-        <translation>لود شدن نمایه بلاکها..</translation>
+        <translation>بارگذاری نمایه بلاک‌ها...</translation>
     </message>
     <message>
         <source>Loading wallet...</source>
-        <translation>wallet در حال لود شدن است...</translation>
+        <translation>کیف پول در حال بارگیری است...</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
-        <translation>قابلیت برگشت به نسخه قبلی برای wallet امکان پذیر نیست</translation>
+        <translation>تنزل نسخه کیف پول امکان پذیر نیست</translation>
     </message>
     <message>
         <source>Rescanning...</source>

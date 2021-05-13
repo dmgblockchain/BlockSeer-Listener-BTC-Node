@@ -1507,10 +1507,6 @@
         <translation>Exportar a un archivo los datos de esta pestaña</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Error</translation>
-    </message>
-    <message>
         <source>Backup Wallet</source>
         <translation>Billetera de Respaldo</translation>
     </message>

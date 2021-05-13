@@ -3,11 +3,11 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>ចុចម៉ៅស្តាំ ដើម្បីកែសម្រួលអាសយដ្ឋាន រឺស្លាក</translation>
+        <translation>ចុចម៉ៅស្ដាំ ដើម្បីកែសម្រួលអាសយដ្ឋាន រឺស្លាក</translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>បង្កើតអាស្រយដ្ឋានថ្មីមួយ</translation>
+        <translation>បង្កើតអាសយដ្ឋានថ្មីមួយ</translation>
     </message>
     <message>
         <source>&amp;New</source>
@@ -31,7 +31,7 @@
     </message>
     <message>
         <source>Enter address or label to search</source>
-        <translation>វាយអាសយដ្ឋាន រឺ បិទស្លាក ដើម្បីស្វែងរក</translation>
+        <translation>វាយអាសយដ្ឋាន រឺស្លាកដើម្បីស្វែងរក</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
@@ -68,6 +68,10 @@
     <message>
         <source>These are your Bitcoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
         <translation>ទាំងនេះ​គឺជាអាសយដ្ឋាន Bitcoin របស់អ្នកសម្រាប់ធ្វើការផ្ញើការបង់ប្រាក់។ តែងតែពិនិត្យមើលចំនួនប្រាក់ និងអាសយដ្ឋានដែលទទួល មុនពេលផ្ញើប្រាក់។</translation>
+    </message>
+    <message>
+        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
+        <translation>ទាំងនេះ​គឺជាអាសយដ្ឋាន Bitcoin របស់អ្នកសម្រាប់ធ្វើការទទួលបង់ប្រាក់។ ប្រើប៊ូតុង "បង្កើតអាសយដ្ឋានទទួលថ្មី" ស្ថិតក្នុងផ្ទាំងទទួល ដើម្បីបង្កើតអាសយដ្ឋានថ្មីមួយ។</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>

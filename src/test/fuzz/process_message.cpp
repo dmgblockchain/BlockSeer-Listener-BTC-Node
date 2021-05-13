@@ -32,7 +32,16 @@
 #include <vector>
 
 namespace {
-const TestingSetup* g_setup;
+
+#ifdef MESSAGE_TYPE
+#define TO_STRING_(s) #s
+#define TO_STRING(s) TO_STRING_(s)
+const std::string LIMIT_TO_MESSAGE_TYPE{TO_STRING(MESSAGE_TYPE)};
+#else
+const std::string LIMIT_TO_MESSAGE_TYPE;
+#endif
+
+const RegTestingSetup* g_setup;
 } // namespace
 
 void initialize_process_message()
@@ -71,13 +80,8 @@ void fuzz_target(const std::vector<uint8_t>& buffer, const std::string& LIMIT_TO
     connman.AddTestNode(p2p_node);
     g_setup->m_node.peerman->InitializeNode(&p2p_node);
     try {
-        g_setup->m_node.peerman->ProcessMessage(p2p_node, random_message_type, random_bytes_data_stream,
-                                                GetTime<std::chrono::microseconds>(), std::atomic<bool>{false});
+        (void)ProcessMessage(&p2p_node, random_message_type, random_bytes_data_stream, GetTimeMillis(), Params(), *g_setup->m_node.mempool, g_setup->m_node.connman.get(), g_setup->m_node.banman.get(), std::atomic<bool>{false});
     } catch (const std::ios_base::failure&) {
-    }
-    {
-        LOCK(p2p_node.cs_sendProcessing);
-        g_setup->m_node.peerman->SendMessages(&p2p_node);
     }
     SyncWithValidationInterfaceQueue();
     LOCK2(::cs_main, g_cs_orphans); // See init.cpp for rationale for implicit locking order requirement

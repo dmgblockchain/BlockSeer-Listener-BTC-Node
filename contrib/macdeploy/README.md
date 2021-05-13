@@ -10,7 +10,17 @@ When complete, it will have produced `Bitcoin-Core.dmg`.
 
 ## SDK Extraction
 
-### Step 1: Obtaining `Xcode.app`
+Our current macOS SDK (`macOSX10.14.sdk`) can be extracted from
+[Xcode_10.2.1.xip](https://download.developer.apple.com/Developer_Tools/Xcode_10.2.1/Xcode_10.2.1.xip).
+An Apple ID is needed to download this.
+
+`Xcode.app` is packaged in a `.xip` archive.
+This makes the SDK less-trivial to extract on non-macOS machines.
+One approach (tested on Debian Buster) is outlined below:
+
+```bash
+
+apt install clang cpio git liblzma-dev libxml2-dev libssl-dev make
 
 Our current macOS SDK
 (`Xcode-11.3.1-11C505-extracted-SDK-with-libcxx-headers.tar.gz`) can be
@@ -27,15 +37,14 @@ approach (tested on Debian Buster) is outlined below:
 apt install cpio
 git clone https://github.com/bitcoin-core/apple-sdk-tools.git
 
-# Unpack Xcode_11.3.1.xip and place the resulting Xcode.app in your current
-# working directory
-python3 apple-sdk-tools/extract_xcode.py -f Xcode_11.3.1.xip | cpio -d -i
+find Xcode.app -type d -name MacOSX.sdk -exec sh -c 'tar --transform="s/MacOSX.sdk/MacOSX10.14.sdk/" -c -C$(dirname {}) MacOSX.sdk/ | gzip -9n > MacOSX10.14.sdk.tar.gz' \;
 ```
 
 On macOS the process is more straightforward:
 
 ```bash
-xip -x Xcode_11.3.1.xip
+xip -x Xcode_10.2.1.xip
+tar -s "/MacOSX.sdk/MacOSX10.14.sdk/" -C Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/ -czf MacOSX10.14.sdk.tar.gz MacOSX.sdk
 ```
 
 ### Step 2: Generating `Xcode-11.3.1-11C505-extracted-SDK-with-libcxx-headers.tar.gz` from `Xcode.app`

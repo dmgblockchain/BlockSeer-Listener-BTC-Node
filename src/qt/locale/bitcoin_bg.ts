@@ -451,19 +451,11 @@
     </message>
     <message>
         <source>Close Wallet...</source>
-        <translation>Затвори Портфейла</translation>
+        <translation>Затвори портфейла</translation>
     </message>
     <message>
         <source>Close wallet</source>
         <translation>Затвори портфейла</translation>
-    </message>
-    <message>
-        <source>Close All Wallets...</source>
-        <translation>Затвори Всички Портфейли...</translation>
-    </message>
-    <message>
-        <source>Close all wallets</source>
-        <translation>Затвори всички портфейли</translation>
     </message>
     <message>
         <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
@@ -2218,10 +2210,6 @@
     <message>
         <source>Close wallet</source>
         <translation>Затвори портфейла</translation>
-    </message>
-    <message>
-        <source>Close all wallets</source>
-        <translation>Затвори всички портфейли</translation>
     </message>
     </context>
 <context>

@@ -10,11 +10,10 @@
 #ifndef BITCOIN_NET_PERMISSIONS_H
 #define BITCOIN_NET_PERMISSIONS_H
 
-struct bilingual_str;
-
 extern const std::vector<std::string> NET_PERMISSIONS_DOC;
 
-enum NetPermissionFlags {
+enum NetPermissionFlags
+{
     PF_NONE = 0,
     // Can query bloomfilter even if -peerbloomfilters is false
     PF_BLOOMFILTER = (1U << 1),
@@ -24,10 +23,8 @@ enum NetPermissionFlags {
     // Always relay transactions from this peer, even if already in mempool
     // Keep parameter interaction: forcerelay implies relay
     PF_FORCERELAY = (1U << 2) | PF_RELAY,
-    // Allow getheaders during IBD and block-download after maxuploadtarget limit
-    PF_DOWNLOAD = (1U << 6),
     // Can't be banned/disconnected/discouraged for misbehavior
-    PF_NOBAN = (1U << 4) | PF_DOWNLOAD,
+    PF_NOBAN = (1U << 4),
     // Can query the mempool
     PF_MEMPOOL = (1U << 5),
     // Can request addrs without hitting a privacy-preserving cache

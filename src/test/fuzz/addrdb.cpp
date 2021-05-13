@@ -24,7 +24,7 @@ FUZZ_TARGET(addrdb)
             return CBanEntry{fuzzed_data_provider.ConsumeIntegral<int64_t>()};
             break;
         case 1: {
-            const std::optional<CBanEntry> ban_entry = ConsumeDeserializable<CBanEntry>(fuzzed_data_provider);
+            const Optional<CBanEntry> ban_entry = ConsumeDeserializable<CBanEntry>(fuzzed_data_provider);
             if (ban_entry) {
                 return *ban_entry;
             }
@@ -33,5 +33,4 @@ FUZZ_TARGET(addrdb)
         }
         return CBanEntry{};
     }();
-    (void)ban_entry; // currently unused
 }

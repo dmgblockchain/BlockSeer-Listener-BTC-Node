@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Klik-kanan untuk mengubah alamat atau label</translation>
+        <translation>Klik-kanan untuk mengedit alamat atau label</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>Hapus alamat yang sementara dipilih dari daftar</translation>
+        <translation>Hapus alamat yang saat ini dipilih dari daftar</translation>
     </message>
     <message>
         <source>Enter address or label to search</source>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Copy &amp;Label</source>
-        <translation>Salin&amp; Label</translation>
+        <translation>Salin &amp;Label</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
@@ -1777,7 +1777,7 @@
     </message>
     <message>
         <source>The mapped Autonomous System used for diversifying peer selection.</source>
-        <translation>Sistem Otonom yang dipetakan digunakan untuk mendiversifikasi pilihan peer</translation>
+        <translation>Autonomous System yang dipetakan digunakan untuk mendiversifikasi pilihan peer</translation>
     </message>
     <message>
         <source>Mapped AS</source>
@@ -2366,8 +2366,16 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
         <translation>Konfirmasi proposal transaksi</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Salin PSBT ke papan klip</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Kirim</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>PSBT disalin</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>
@@ -3115,12 +3123,12 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
         <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
         <translation>Menutup dompet terlalu lama dapat menyebabkan harus menyinkron ulang seluruh rantai jika pemangkasan diaktifkan.</translation>
     </message>
-    </context>
+</context>
 <context>
     <name>WalletFrame</name>
     <message>
-        <source>Create a new wallet</source>
-        <translation>Bikin dompet baru</translation>
+        <source>No wallet has been loaded.</source>
+        <translation>Tidak ada dompent yang dimuat.</translation>
     </message>
 </context>
 <context>
@@ -3193,10 +3201,6 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
         <translation>Ekspor data dalam tab sekarang ke sebuah berkas</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Kesalahan</translation>
-    </message>
-    <message>
         <source>Backup Wallet</source>
         <translation>Cadangkan Dompet</translation>
     </message>
@@ -3238,6 +3242,10 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
     <message>
         <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
         <translation>Pemangkasan: sinkronisasi dompet terakhir melampaui data yang sudah dipangkas. Anda perlu -reindex (unduh seluruh blockchain lagi jika terjadi node pemangkasan)</translation>
+    </message>
+    <message>
+        <source>Error: A fatal internal error occurred, see debug.log for details</source>
+        <translation>Error: Kesalahan internal fatal terjadi, lihat debug.log untuk detailnya</translation>
     </message>
     <message>
         <source>Pruning blockstore...</source>
@@ -3318,6 +3326,10 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
     <message>
         <source>Loading P2P addresses...</source>
         <translation>Memuat alamat P2P....</translation>
+    </message>
+    <message>
+        <source>Error: Disk space is too low!</source>
+        <translation>Eror: Kapasitas penyimpanan penuh!</translation>
     </message>
     <message>
         <source>Loading banlist...</source>
@@ -3444,6 +3456,10 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
     <message>
         <source>Verifying wallet(s)...</source>
         <translation>Memverifikasi dompet...</translation>
+    </message>
+    <message>
+        <source>Zapping all transactions from wallet...</source>
+        <translation>Setiap transaksi dalam dompet sedang di-'Zap'...</translation>
     </message>
     <message>
         <source>%s is set very high!</source>

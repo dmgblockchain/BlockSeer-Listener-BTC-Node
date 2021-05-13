@@ -138,6 +138,7 @@ static RPCHelpMan getpeerinfo()
                             {
                                 {RPCResult::Type::NUM, "n", "The heights of blocks we're currently asking from this peer"},
                             }},
+                            {RPCResult::Type::BOOL, "whitelisted", "Whether the peer is whitelisted"},
                             {RPCResult::Type::ARR, "permissions", "Any special permissions that have been granted to this peer",
                             {
                                 {RPCResult::Type::STR, "permission_type", Join(NET_PERMISSIONS_DOC, ",\n") + ".\n"},
@@ -663,20 +664,20 @@ static RPCHelpMan setban()
             absolute = true;
 
         if (isSubnet) {
-            node.banman->Ban(subNet, banTime, absolute);
-            if (node.connman) {
-                node.connman->DisconnectNode(subNet);
+            g_rpc_node->banman->Ban(subNet, banTime, absolute);
+            if (g_rpc_node->connman) {
+                g_rpc_node->connman->DisconnectNode(subNet);
             }
         } else {
-            node.banman->Ban(netAddr, banTime, absolute);
-            if (node.connman) {
-                node.connman->DisconnectNode(netAddr);
+            g_rpc_node->banman->Ban(netAddr, banTime, absolute);
+            if (g_rpc_node->connman) {
+                g_rpc_node->connman->DisconnectNode(netAddr);
             }
         }
     }
     else if(strCommand == "remove")
     {
-        if (!( isSubnet ? node.banman->Unban(subNet) : node.banman->Unban(netAddr) )) {
+        if (!( isSubnet ? g_rpc_node->banman->Unban(subNet) : g_rpc_node->banman->Unban(netAddr) )) {
             throw JSONRPCError(RPC_CLIENT_INVALID_IP_OR_SUBNET, "Error: Unban failed. Requested address/subnet was not previously manually banned.");
         }
     }
@@ -687,7 +688,7 @@ static RPCHelpMan setban()
 
 static RPCHelpMan listbanned()
 {
-    return RPCHelpMan{"listbanned",
+            RPCHelpMan{"listbanned",
                 "\nList all manually banned IPs/Subnets.\n",
                 {},
         RPCResult{RPCResult::Type::ARR, "", "",

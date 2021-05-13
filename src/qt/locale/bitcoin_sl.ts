@@ -2546,18 +2546,6 @@ Opomba: Ker se provizija izračuna na bajt, bi provizija "100 satoshijev na kB" 
         <translation>Ali ste prepričani, da želite poslati sredstva?</translation>
     </message>
     <message>
-        <source>Create Unsigned</source>
-        <translation>Ustvari nepodpisano</translation>
-    </message>
-    <message>
-        <source>Save Transaction Data</source>
-        <translation>Shrani podatke transakcije</translation>
-    </message>
-    <message>
-        <source>Partially Signed Transaction (Binary) (*.psbt)</source>
-        <translation>Delno podpisana bitcoin-transakcija (binarno) (*.psbt)</translation>
-    </message>
-    <message>
         <source>PSBT saved</source>
         <translation>DPBT shranjena</translation>
     </message>

@@ -397,7 +397,7 @@ Firmar solo es posible con correos del tipo Legacy.</translation>
     </message>
     <message>
         <source>Encrypt the private keys that belong to your wallet</source>
-        <translation>Cifrar las claves privadas que pertenecen a tu cartera</translation>
+        <translation>Encriptar las claves privadas que pertenecen a su billetera</translation>
     </message>
     <message>
         <source>Sign messages with your Bitcoin addresses to prove you own them</source>
@@ -546,14 +546,6 @@ Firmar solo es posible con correos del tipo Legacy.</translation>
     <message>
         <source>Show the %1 help message to get a list with possible Bitcoin command-line options</source>
         <translation>Muestra el mensaje de ayuda %1 para obtener una lista con posibles opciones de línea de comandos de Bitcoin.</translation>
-    </message>
-    <message>
-        <source>&amp;Mask values</source>
-        <translation>&amp;Esconder valores</translation>
-    </message>
-    <message>
-        <source>Mask the values in the Overview tab</source>
-        <translation>Esconder los valores de la ventana de previsualización</translation>
     </message>
     <message>
         <source>default wallet</source>
@@ -1139,7 +1131,7 @@ Firmar solo es posible con correos del tipo Legacy.</translation>
     </message>
     <message>
         <source>Open wallet warning</source>
-        <translation>Ver aviso sobre la cartera</translation>
+        <translation>Aviso de apertura de monedero</translation>
     </message>
     <message>
         <source>default wallet</source>
@@ -2590,8 +2582,16 @@ Nota: Dado que la comisión se calcula por byte, una comisión de "100 satoshis 
         <translation>Confirme la propuesta de transaccion</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Copiar la TBPF al portapapeles</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Enviar</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>TBPF copiada</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>

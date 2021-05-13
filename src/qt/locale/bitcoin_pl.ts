@@ -484,22 +484,6 @@ Podpisywanie jest możliwe tylko z adresami typu „legacy”.</translation>
         <translation>Aktualny</translation>
     </message>
     <message>
-        <source>&amp;Load PSBT from file...</source>
-        <translation>Wczytaj PSBT z p&amp;liku ..</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction</source>
-        <translation>Załaduj częściowo podpisaną transakcję Bitcoin</translation>
-    </message>
-    <message>
-        <source>Load PSBT from clipboard...</source>
-        <translation>Wczytaj PSBT do schowka</translation>
-    </message>
-    <message>
-        <source>Load Partially Signed Bitcoin Transaction from clipboard</source>
-        <translation>Załaduj częściowo podpisaną transakcję Bitcoin ze schowka</translation>
-    </message>
-    <message>
         <source>Node window</source>
         <translation>Okno węzła</translation>
     </message>
@@ -2455,16 +2439,8 @@ Uwaga: Ponieważ opłata jest naliczana za każdy bajt, opłata "100 satoshi za 
         <translation>Czy na pewno chcesz wysłać?</translation>
     </message>
     <message>
-        <source>Create Unsigned</source>
-        <translation>Utwórz niepodpisaną transakcję</translation>
-    </message>
-    <message>
-        <source>Save Transaction Data</source>
-        <translation>Zapisz dane transakcji</translation>
-    </message>
-    <message>
-        <source>PSBT saved</source>
-        <translation>Zapisano PSBT</translation>
+        <source>Please, review your transaction proposal. This will produce a Partially Signed Bitcoin Transaction (PSBT) which you can copy and then sign with e.g. an offline %1 wallet, or a PSBT-compatible hardware wallet.</source>
+        <translation>Proszę przejrzeć propozycję transakcji. Zostanie utworzona częściowo podpisana transakcja (ang. PSBT), którą można skopiować, a następnie podpisać np. offline z portfelem %1 lub z innym portfelem zgodnym z PSBT.</translation>
     </message>
     <message>
         <source>or</source>
@@ -2503,8 +2479,16 @@ Uwaga: Ponieważ opłata jest naliczana za każdy bajt, opłata "100 satoshi za 
         <translation>Potwierdź propozycję transakcji</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Skopiuj PSBT do schowka</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Wyślij</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>Skopiowano PSBT</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>

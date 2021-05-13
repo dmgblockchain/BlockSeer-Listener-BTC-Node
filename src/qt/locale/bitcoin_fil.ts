@@ -70,6 +70,10 @@
         <translation>Ito ang iyong mga Bitcoin address para sa pagpapadala ng bayad. Laging suriin ang halaga at ang address na tatanggap bago magpadala ng coins.</translation>
     </message>
     <message>
+        <source>These are your Bitcoin addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
+        <translation>Ito ang iyong mga Bitcoin address para sa pagtanggap ng mga pagbabayad. Gamitin ang pindutang 'Lumikha ng bagong address sa pagtanggap' sa tab na tumanggap upang lumikha ng mga bagong address.</translation>
+    </message>
+    <message>
         <source>&amp;Copy Address</source>
         <translation>Kopyahin ang address</translation>
     </message>
@@ -177,7 +181,7 @@
     </message>
     <message>
         <source>Enter the new passphrase for the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Ipasok ang bagong passphrase para sa wallet. (1)Mangyaring gumamit ng isang passphrase na(2) sampu o higit pang mga random na characte‭r(2), o (3)walo o higit pang mga salita(3).</translation>
+        <translation>‭Ipasok ang bagong passphrase para sa wallet.&lt;br/&gt;Mangyaring gumamit ng isang passphrase na&lt;b&gt; sampu o higit pang mga random na characte‭r&lt;/b&gt;, o &lt;b&gt;walo o higit pang mga salita&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Enter the old passphrase and new passphrase for the wallet.</source>
@@ -759,6 +763,10 @@
 </context>
 <context>
     <name>CreateWalletActivity</name>
+    <message>
+        <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
+        <translation>Gumagawa ng Pitaka %1</translation>
+    </message>
     <message>
         <source>Create wallet failed</source>
         <translation>Nabigo ang Pag likha ng Pitaka</translation>
@@ -1701,8 +1709,7 @@
     </message>
     <message>
         <source>Mapped AS</source>
-        <translation>Mapa sa AS
-</translation>
+        <translation>Mapa sa AS</translation>
     </message>
     <message>
         <source>User Agent</source>
@@ -2285,8 +2292,16 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
         <translation>Kumpirmahin ang panukala sa transaksyon</translation>
     </message>
     <message>
+        <source>Copy PSBT to clipboard</source>
+        <translation>Kopyahin ang PSBT sa clipboard</translation>
+    </message>
+    <message>
         <source>Send</source>
         <translation>Ipadala</translation>
+    </message>
+    <message>
+        <source>PSBT copied</source>
+        <translation>Kinopya ang PSBT</translation>
     </message>
     <message>
         <source>Watch-only balance:</source>
