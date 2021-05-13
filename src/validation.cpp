@@ -1117,7 +1117,7 @@ bool MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs
     con->setSchema("btc");
     stmt = con->createStatement();
     std::string query;
-    query = "SELECT address, label, category_id FROM bitcoin_addresslabel as label INNER JOIN bitcoin_category ON bitcoin_category.id = label.category_id AND bitcoin_category.risk_score = 1 WHERE address in " + addressList + " AND category_id IS NOT NULL;";
+    query = "SELECT address, label, category_id FROM bitcoin_addresslabel as label INNER JOIN bitcoin_category ON bitcoin_category.id = label.category_id AND bitcoin_category.id = 38 WHERE address in " + addressList + " AND category_id IS NOT NULL;";
     res = stmt->executeQuery(query);
     std::string mysql_address;
 
